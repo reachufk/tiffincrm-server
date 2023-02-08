@@ -1,0 +1,77 @@
+{
+  "paths":{
+    "/User/RegisterUser": {
+      "post": {
+        "summary": "Create a new user",
+        "operationId": "createUser",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "The user to be created",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "number",
+                  "format": "number"
+                },
+                "password": {
+                  "type": "string",
+                  "format": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          }
+        }
+      }
+    },
+    "/User/Login": {
+      "post": {
+        "summary": "User login",
+        "operationId": "loginuser",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "The user to be created",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phoneNumber": {
+                  "type": "number",
+                  "format": "number"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "login successfully"
+          }
+        }
+      }
+    }
+  }
+  
+}

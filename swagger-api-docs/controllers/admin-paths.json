@@ -1,0 +1,41 @@
+{
+      "paths":{
+        "/Admin/Login": {
+          "post": {
+            "summary": "Admin login",
+            "operationId": "adminlogin",
+            "tags": [
+              "Admin"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "admin",
+                "description": "login admin",
+                "required": true,
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "required":true
+                    },
+                    "password": {
+                      "type": "string",
+                      "required":true
+                    }
+                  }
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "login successfully"
+              }
+            }
+          }
+        }
+      }
+      
+    }
