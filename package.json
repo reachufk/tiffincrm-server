@@ -1,5 +1,5 @@
 {
-  "name": "restaurant-be",
+  "name": "tiffin-server",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AsifAhmadDar/Restaurant-BE.git"
+    "url": "git+https://github.com/reachufk/tiffincrm-server.git"
   },
   "author": "Asif",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AsifAhmadDar/Restaurant-BE/issues"
+    "url": "https://github.com/reachufk/tiffincrm-server/issues"
   },
-  "homepage": "https://github.com/AsifAhmadDar/Restaurant-BE#readme",
+  "homepage": "https://github.com/reachufk/tiffincrm-server#readme",
   "dependencies": {
     "aws-sdk": "^2.1310.0",
     "bcrypt": "^5.1.0",
