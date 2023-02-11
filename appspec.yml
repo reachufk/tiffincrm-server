@@ -5,10 +5,6 @@ files:
     destination: /home/ec2-user/tiffincrm-server
     file_exists_behavior: OVERWRITE
 hooks:
-  ApplicationStop:
-    - location: scripts/application_stop.sh
-      timeout: 200
-      runas: root
   BeforeInstall:
     - location: scripts/install_dependencies.sh
       timeout: 300
