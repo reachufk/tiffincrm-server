@@ -4,7 +4,6 @@ var cors = require('cors');
 var mongoose = require("mongoose")
 var bodyParser = require('body-parser');
 var config = require('../config/config');
-const UserController = require('./controllers/user/user-controller')
 const compression = require('compression');
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));

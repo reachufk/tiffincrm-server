@@ -23,6 +23,9 @@ mongoose.connect(environment.databaseConnection,
 const port = process.env.PORT || 3000;
 
 app.use(routes);
+app.get('/GetUsers',(req,res)=>{
+      res.render('<html><p>hello</p></html>');
+})
 app.listen(port, () => {
       console.log(`server is listening on port ${port}`)
 })
