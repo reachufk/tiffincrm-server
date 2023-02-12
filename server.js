@@ -21,7 +21,6 @@ mongoose.connect(environment.databaseConnection,
       .catch((error) => console.log(error));
 
 const port = process.env.PORT || 3000;
-
 app.use(routes);
 
 app.listen(port, () => {
