@@ -1,13 +1,14 @@
 var AWS = require("aws-sdk");
-require('dotenv').config({ path: "../../config/.env" })
+require('dotenv').config({ path: "" })
+const config = require('../../config/config')
 const s3 = new AWS.S3({
-      accessKeyId: process.env.Aws_Access_Id_Key,
-      secretAccessKey: process.env.Aws_Secret_Key
+      accessKeyId: config.Aws_Access_Key,
+      secretAccessKey: config.Aws_Secret_Key
 })
 
 const UploadCatagoryImage = async ({ fileName, fileType, fileData }) => {
       const params = {
-            Bucket: process.env.AWS_BUCKET_NAME,
+            Bucket: config.Aws_Bucket_Name,
             Key: `CataogryImages/${fileName}`,
             Body: fileData,
             ContentEncoding: 'base64',
@@ -15,10 +16,14 @@ const UploadCatagoryImage = async ({ fileName, fileType, fileData }) => {
       }
       try {
             const upload = await s3.upload(params).promise();
-            return upload.Location
+            if (upload.Location){
+                  return upload.Location
+            }else{
+                  return false
+            }          
       } catch (error) {
             throw error;
       }
 }
 
-module.exports = UploadCatagoryImage
+module.exports = { UploadCatagoryImage }

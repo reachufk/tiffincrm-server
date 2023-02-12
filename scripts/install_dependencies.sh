@@ -10,7 +10,7 @@ export NVM_DIR="$HOME/.nvm"
 # Install Node.js
 nvm install 16
 
-# Use Node.js version 14
+# Use Node.js version 16
 nvm use 16
 
 # Install pm2

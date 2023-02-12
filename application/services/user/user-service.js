@@ -15,13 +15,13 @@ exports.RegisterUser = async (req, res) => {
 }
 
 exports.Login = async (req, res) => {
-      const {phoneNumber,password} = req.body;
-      const User = await UserModel.findOne({ phoneNumber });
+      const payload = req.body;
+      const User = await UserModel.findOne({ phoneNumber:payload.phoneNumber });
       if (User) {
-           const isMatched = await User.comparePassword(password,User.password);
+           const isMatched = await User.comparePassword(payload.password,User.password);
            if(isMatched){
-            const token = Authorization.Authorize(User);
-            const response ={name:User.name,phoneNumber,token}
+            const token = Authorization.Authorize(User?._doc);
+            const response ={name:User.name,phoneNumber:User.phoneNumber,token}
             res.status(200).send(response)
            }else{
             res.status(401).send('invalid phone/password');
