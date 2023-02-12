@@ -117,7 +117,7 @@ exports.SaveCatagoryItem = async (req, res) => {
 }
 
 exports.GetCatagoryItem = async (req, res) => {
-      const CatagoryItemID = req.query.catagoryItemID;
+      const CatagoryItemID = req.query.catagoryItem;
       try {
             const CatagoryItem = await CatagoryItemModel.findById(CatagoryItemID);
             if (CatagoryItem) {
@@ -132,7 +132,7 @@ exports.GetCatagoryItem = async (req, res) => {
 }
 
 exports.UpdateCatagoryItem = async (req, res) => {
-      const CatagoryItemID = req.query.catagoryItemID;
+      const CatagoryItemID = req.query.catagoryItem;
       const CatagoryItem = req.body;
       const UpdateResponse = await CatagoryItemModel.findOneAndUpdate({ _id: CatagoryItemID }, CatagoryItem);
       if (UpdateResponse) {
@@ -143,7 +143,7 @@ exports.UpdateCatagoryItem = async (req, res) => {
 }
 
 exports.DeleteCatagoryItem = async (req, res) => {
-      const CatagoryItemID = req.query.catagoryItemID;
+      const CatagoryItemID = req.query.catagoryItem;
       const DeleteResponse = await CatagoryItemModel.findOneAndDelete({ _id: CatagoryItemID });
       if (DeleteResponse) {
             res.status(200).send('catagory item deleted')

@@ -1,0 +1,11 @@
+{
+      "Admin": {
+        "type": "object",
+        "properties": {
+            "email": { "type": "string" },
+            "fullName":{"type":"string"},
+            "phoneNumber": { "type": "number"},
+            "password": { "type": "string" }
+        }
+      }
+    }

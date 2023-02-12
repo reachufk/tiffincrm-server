@@ -16,5 +16,4 @@ mongoose.connect(config.databaseConnection,
       { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log("connection to database sucessfully."))
       .catch((error) => console.log(error));
 
-
 module.exports = app

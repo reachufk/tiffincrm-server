@@ -1,0 +1,68 @@
+{
+      "Catagory": {
+            "type": "object",
+            "properties": {
+                  "catagoryName": {
+                        "type": "string",
+                        "required": true
+                  },
+                  "catagoryType": {
+                        "type": "string",
+                        "required": true
+                  },
+                  "isInstant": {
+                        "type": "boolean",
+                        "required": true
+                  },
+                  "catagoryImage": {
+                        "type": "string"
+                  },
+                  "catagoryImageType": {
+                        "type": "string"
+                  },
+                  "catagoryImageName": {
+                        "type": "string"
+                  }
+            }
+      },
+      "CatagoryItem": {
+            "type": "object",
+            "properties": {
+                  "catagory": {
+                        "type": "string",
+                        "required": true
+                  },
+                  "itemName": {
+                        "type": "string",
+                        "required": true
+                  },
+                  "itemPrice": {
+                        "type": "number",
+                        "required": true
+                  },
+                  "itemDiscount": {
+                        "type": "number"
+                  }
+            }
+      },
+
+      "CatagoryItems": {
+            "type": "object",
+            "properties": {
+                  "pageNo": {
+                        "type": "number",
+                        "required": true
+                  },
+                  "pageSize": {
+                        "type": "number",
+                        "required": true
+                  },
+                  "keyword": {
+                        "type": "string"
+                  },
+                  "catagory": {
+                        "type": "string","required":true
+                  }
+            }
+      }
+}

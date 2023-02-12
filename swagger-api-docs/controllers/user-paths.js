@@ -1,5 +1,4 @@
-{
-  "paths":{
+const UserApis = {
     "/User/RegisterUser": {
       "post": {
         "summary": "Create a new user",
@@ -13,22 +12,7 @@
             "name": "user",
             "description": "The user to be created",
             "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "phoneNumber": {
-                  "type": "number",
-                  "format": "number"
-                },
-                "password": {
-                  "type": "string",
-                  "format": "password"
-                }
-              }
-            }
+            "schema":require('../definitions/user-definition.json').User
           }
         ],
         "responses": {
@@ -49,7 +33,7 @@
           {
             "in": "body",
             "name": "user",
-            "description": "The user to be created",
+            "description": "user login",
             "required": true,
             "schema": {
               "type": "object",
@@ -71,7 +55,39 @@
           }
         }
       }
+    },
+    "/User/UpdateUser": {
+      "put": {
+        "summary": "User update",
+        "operationId": "update user",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "schema": {
+              "type": "string",
+              "required": true
+            },
+            "description": "The user ID to update"
+          },
+          {
+            "in": "body",
+            "name": "user",
+            "description": "user login",
+            "required": true,
+            "schema":require('../definitions/user-definition.json').User
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "login successfully"
+          }
+        }
+      }
     }
-  }
-  
 }
+
+module.exports = UserApis

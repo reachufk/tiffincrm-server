@@ -1,16 +1,16 @@
 {
-      "User": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "phoneNumber": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          }
+  "User": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "phoneNumber": {
+        "type": "number"
+      },
+      "password": {
+        "type": "string"
       }
-}
+    }
+  }
 }
