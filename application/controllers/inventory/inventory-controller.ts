@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+// const express = require('express');
+// const router = express.Router();
 const inventoryService = require('../../services/inventory/inventory-service')
 
 //cataories apis

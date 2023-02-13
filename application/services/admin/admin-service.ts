@@ -1,5 +1,5 @@
 const Authorization = require('../../utils/authorization_util');
-const AdminModel = require('../../models/admin/admin-model')
+// const AdminModel = require('../../models/admin/admin-model')
 
 exports.RegisterAdmin = async (req, res) => {
       const Admin = new AdminModel(req.body)

@@ -14,7 +14,7 @@ exports.SaveCatagory = async (req, res) => {
                   const imageData = {
                         fileName: Catagory.catagoryImageName,
                         fileType: Catagory.catagoryImageType,
-                        fileData: new Buffer.from(Catagory?.catagoryImage?.replace(/^data:image\/\w+;base64,/, ""), 'base64')
+                        fileData:  Buffer.from(Catagory?.catagoryImage?.replace(/^data:image\/\w+;base64,/, ""), 'base64')
                   }
                   const awsImageLocation = await AwsUtility.UploadCatagoryImage(imageData);
                   if (awsImageLocation) {

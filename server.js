@@ -1,11 +1,12 @@
-const express = require('express');
+// const express = require('express');
+import {express} from 'express'
 const app = express();
 var cors = require('cors');
 var mongoose = require("mongoose")
-const swaggerUi = require('swagger-ui-express');
+import swaggerUi from 'swagger-ui-express';
 var bodyParser = require('body-parser');
-var environment = require('./config/config');
-const compression = require('compression');
+var environment = require('./config/config.ts');
+import compression from 'compression';
 const swaggerDocument = require('./swagger-api-docs/swagger-doc');
 const routes= require('./application/routes-domain/domain-routes')
 app.use(bodyParser.json({ limit: '50mb' }));

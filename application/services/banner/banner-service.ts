@@ -52,7 +52,7 @@ exports.UpdateBanner = async (req, res) => {
       const Banner = req.body;;
       const BannerID = req.query.banner;
       try {
-            isExists = await BannerModel.findOneAndUpdate({ _id: BannerID }, Banner)
+           const isExists = await BannerModel.findOneAndUpdate({ _id: BannerID }, Banner)
             if (isExists) {
                   res.status(200).send("Banner Updated")
             } else {
@@ -67,7 +67,7 @@ exports.UpdateBanner = async (req, res) => {
 exports.DeleteBanner = async (req, res) => {
       const BannerID = req.query.banner;
       try {
-            isDeleted = await BannerModel.findOneAndDelete({ _id: BannerID })
+            const isDeleted = await BannerModel.findOneAndDelete({ _id: BannerID })
             if (isDeleted) {
                   res.status(200).send("Banner deleted")
             } else {

@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+// const express = require('express');
+// const router = express.Router();
 const adminService = require('../../services/admin/admin-service');
 
 router.post('/RegisterAdmin',adminService.RegisterAdmin)

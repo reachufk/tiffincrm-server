@@ -1,4 +1,4 @@
-const Authorization = require('../../utils/authorization_util');
+// const Authorization = require('../../utils/authorization_util');
 const UserModel = require('../../models/user/user-model')
 
 exports.RegisterUser = async (req, res) => {

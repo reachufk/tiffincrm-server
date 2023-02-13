@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const CategoryItemSchema = new mongoose.Schema({
       catagory:{type:mongoose.Types.ObjectId,required:true},
       itemName:{type:String,required:true,unique:true},
