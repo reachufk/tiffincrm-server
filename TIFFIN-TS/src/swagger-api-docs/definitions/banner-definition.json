@@ -1,0 +1,15 @@
+{
+      "Banner": {
+            "type": "object",
+            "properties": {
+                  "bannerName": {
+                        "type": "string",
+                        "required": true
+                  },
+                  "bannerImage": {
+                        "type": "string",
+                        "require": true
+                  }
+            }
+      }
+}
