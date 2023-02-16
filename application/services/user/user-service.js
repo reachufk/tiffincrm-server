@@ -24,17 +24,17 @@ exports.RegisterUser = async (req, res) => {
 exports.Login = async (req, res) => {
       const payload = req.body;
       try {
-            const User = await UserModel.findOne({ phoneNumber:payload.phoneNumber });
+            const User = await UserModel.findOne({ phoneNumber: payload.phoneNumber });
             if (User) {
-                 const isMatched = await User.comparePassword(payload.password,User.password);
-                 if(isMatched){
-                  const token = Authorization.Authorize(User?._doc);
-                  const response = {name:User.name,phoneNumber:User.phoneNumber,token}
-                  res.status(200).send(response)
-                 }else{
-                  res.status(401).send('invalid phone/password');
-                 }
-            }else{
+                  const isMatched = await User.comparePassword(payload.password, User.password);
+                  if (isMatched) {
+                        const token = Authorization.Authorize(User?._doc);
+                        const response = { name: User.name, phoneNumber: User.phoneNumber, token }
+                        res.status(200).send(response)
+                  } else {
+                        res.status(401).send('invalid phone/password');
+                  }
+            } else {
                   res.status(404).send('invalid phone');
             }
       } catch (error) {
@@ -47,10 +47,10 @@ exports.UpdateUser = async (req, res) => {
       const User = req.body;
       const userId = req.query.user
       try {
-            const UpdateUser = await UserModel.findOneAndUpdate({_id:userId},User);
+            const UpdateUser = await UserModel.findOneAndUpdate({ _id: userId }, User);
             if (UpdateUser) {
                   res.status(200).send('user updated');
-            }else{
+            } else {
                   res.status(404).send('user not found');
             }
       } catch (error) {
@@ -58,3 +58,46 @@ exports.UpdateUser = async (req, res) => {
       }
 
 }
+
+exports.GetUser = async (req, res) => {
+      const userId = req.query.user;
+      try {
+            const User = await UserModel.findById(userId);
+            if (User) {
+                  res.status(200).send(User)
+            } else {
+                  res.status(404).send('user not found')
+            }
+      } catch (error) {
+            res.status(400).send(error.message)
+      }
+}
+
+exports.GetUsers = async (req, res) => {
+      try {
+            const { pageNo, pageSize, keyword } = req.body
+            const projection = { password: 0 }
+            const query = {
+                  $or: [
+                        { firstName: { $regex: keyword, $options: 'i' } },
+                        { lastName: { $regex: keyword, $options: 'i' } },
+                        { email: { $regex: keyword, $options: 'i' } }
+                  ]
+            }
+            const totalCount = await UserModel.countDocuments(query);
+            const totalPages = Math.ceil(+totalCount / +pageSize);
+            const users = await UserModel.find(query, projection)
+                  .skip((+pageNo - 1) * +pageSize)
+                  .limit(+pageSize)
+                  .exec();
+            if (users && users?.length) {
+                  res.status(200).send({ users, totalCount, totalPages })
+            } else {
+                  res.status(404).send('no user found')
+            }
+
+      } catch (error) {
+            res.status(400).send(error.message)
+      }
+}
+

@@ -2,15 +2,11 @@
   "User": {
     "type": "object",
     "properties": {
-      "name": {
-        "type": "string"
-      },
-      "phoneNumber": {
-        "type": "number"
-      },
-      "password": {
-        "type": "string"
-      }
+      "email":{"type":"string","required":true},
+      "firstName":{"type":"string"},
+      "lastName":{"type":"string"},
+      "phoneNumber": {"type": "number"},
+      "password": {"type": "string"}
     }
   }
 }
