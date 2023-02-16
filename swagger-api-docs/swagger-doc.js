@@ -33,7 +33,6 @@ const apidoc = {
     "/Inventory/GetCatagoryItems":InventoryPaths['/Inventory/GetCatagoryItems'],
     "/Inventory/UpdateCatagoryItem":InventoryPaths['/Inventory/UpdateCatagoryItem'],
     "/Inventory/DeleteCatagoryItem":InventoryPaths['/Inventory/DeleteCatagoryItem'],
-
   }
 }
 
