@@ -1,5 +1,7 @@
 const Authorization = require('../../utils/authorization_util');
-const UserModel = require('../../models/user/user-model')
+const UserModel = require('../../models/user/user-model');
+const { interval } = require('rxjs');
+const { map } = require('rxjs/internal/operators/map');
 
 exports.RegisterUser = async (req, res) => {
       const User = new UserModel(req.body);
@@ -99,5 +101,16 @@ exports.GetUsers = async (req, res) => {
       } catch (error) {
             res.status(400).send(error.message)
       }
+}
+
+exports.GetOrders = async(req,res)=>{
+//   res.set("Content-Type", "text/event-stream")
+//   res.set("Connection", "keep-alive")
+//   res.set("Cache-Control", "no-cache")
+//   res.set("Access-Control-Allow-Origin", "*")
+//   console.log("client connected to sse")
+//   setInterval(function(){
+//       res.status(200).write(`data: ${JSON.stringify('H')}\n\n`)
+//   }, 100)
 }
 

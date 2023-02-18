@@ -2,14 +2,14 @@ var AWS = require("aws-sdk");
 require('dotenv').config({ path: "" })
 const config = require('../../config/config')
 const s3 = new AWS.S3({
-      accessKeyId: config.Aws_Access_Key,
-      secretAccessKey: config.Aws_Secret_Key
+      accessKeyId: config.BUCKET_USER_ACCESS_KEY,
+      secretAccessKey: config.BUCKET_USER_SECRET_KEY
 })
 
 const UploadCatagoryImage = async ({ fileName, fileType, fileData }) => {
       const params = {
             Bucket: config.Aws_Bucket_Name,
-            Key: `CataogryImages/${fileName}`,
+            Key: `CataogryImages/${fileName+'.'+fileType}`,
             Body: fileData,
             ContentEncoding: 'base64',
             ContentType: `image/${fileType}`
@@ -26,4 +26,21 @@ const UploadCatagoryImage = async ({ fileName, fileType, fileData }) => {
       }
 }
 
-module.exports = { UploadCatagoryImage }
+const DeleteCatagoryImage = async (fileName) => {
+      const params = {
+            Bucket: config.Aws_Bucket_Name,
+            Key: `CataogryImages/${fileName}`,
+      }
+      try {
+            const isDeleted = await s3.deleteObject(params).promise();
+            if (isDeleted){
+                  return true
+            }else{
+                  return false
+            }          
+      } catch (error) {
+            throw error;
+      }
+}
+
+module.exports = { UploadCatagoryImage,DeleteCatagoryImage }

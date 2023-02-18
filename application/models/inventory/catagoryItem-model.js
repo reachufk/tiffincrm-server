@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const CategoryItemSchema = new mongoose.Schema({
-      catagory:{type:mongoose.Types.ObjectId,required:true},
+      catagory:{type:String,required:true},
       itemName:{type:String,required:true,unique:true},
       itemPrice:{type:Number,required:true},
       itemDiscount:{type:Number}

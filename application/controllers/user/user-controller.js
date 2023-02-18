@@ -7,6 +7,7 @@ router.post('/Login',userService.Login);
 router.put('/UpdateUser',userService.Login);
 router.get('/GetUser',userService.GetUser);
 router.post('/GetUsers',userService.GetUsers);
+router.get('/GetOrders',userService.GetOrders);
 
 
 module.exports = router;

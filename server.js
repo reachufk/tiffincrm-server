@@ -23,8 +23,7 @@ mongoose.connect(environment.databaseConnection,
 const port = process.env.PORT || 3000;
 
 app.use(routes);
-
-app.listen(port, () => {
+let server = app.listen(port, () => {
       console.log(`server is listening on port ${port}`)
 })
 
