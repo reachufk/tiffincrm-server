@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const CatagoryModel = require('../inventory/catagory-model');
+const UserModel = require('../user/user-model');
 
 const ItemSchema = new mongoose.Schema({
       itemId:{ type: String, required: [true, "itemName not passed"] },
@@ -8,19 +8,12 @@ const ItemSchema = new mongoose.Schema({
       count: { type: Number, required: [true, "number of items not passed"] },
 }, { _id: false });
 
-
-const orderedItemSchema = new mongoose.Schema({
-      catagoryName:{ type: String, required: [true, "catagory name not passed"] },
-      catagoryID:{ type: String, required: [true, "catagoryId not passed"] },
-      items:[ItemSchema]
-}, { _id: false });
-
 const OrderSchema = new mongoose.Schema({
       user: { type: mongoose.Types.ObjectId },
       orderAddress: { type: String, required: true },
       orderAmount: { type: Number, required: true },
       orderMode: { type: String, required: [true, "must be either online or offline"] },
-      orderItems: [orderedItemSchema],
+      orderItems: [ItemSchema],
       orderPaymentMode: { type: String, required: [true, "must be either online or offline"] },
       orderInstructions: { type: String },
       orderDeliveryTime: { type: String },
@@ -28,16 +21,21 @@ const OrderSchema = new mongoose.Schema({
       orderPaymentStatus: { type: String },
       userInfo: {},
       orderStatus: { type: String, required: [true, "must be either completed or pending"] },
-});
+},{ timestamps: true });
 
 
 OrderSchema.pre('save', async function (next) {
       const order = this;
-      const catagoriesID = order.orderCatagory;
-      const projection = {catagoryImage: 0, catagoryImageType: 0,__v:0}
-      const catagories = await CatagoryModel.find({ '_id': { $in: catagoriesID } },projection);
-      order.orderCatagory = catagories;
-      next();
+      const { user } = req?.body;
+      try {
+            const userInfo = await UserModel.findOne({_id:user},{password:0,_id:0,__v:0});
+            if(userInfo){
+                  order.userInfo = userInfo;
+                  next();
+            }
+      } catch (error) {
+            return error
+      }
 });
 
 

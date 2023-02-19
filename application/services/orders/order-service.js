@@ -7,16 +7,9 @@ const UserModel = require("../../models/user/user-model");
 exports.PlaceOrder = async (req, res) => {
       try {
             const order = new OrderModel(req.body);
-            const { user } = req?.body;
-            const userInfo = await UserModel.findOne({_id:user},{password:0,_id:0,__v:0});
-            if (userInfo) {
-                  order.userInfo = userInfo;
-                  const savedOrder = await order.save();
-                  socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
-                  res.status(201).json({ statusCode: 201, message: 'order placed', order: savedOrder })
-            }else{
-                  res.status(404).json({ statusCode: 404, error: 'user not found' })
-            }
+            const savedOrder = await order.save();
+            socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
+            res.status(201).json({ statusCode: 201, message: 'order placed', order: savedOrder });
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error?.message })
       }
