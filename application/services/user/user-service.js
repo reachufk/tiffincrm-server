@@ -24,7 +24,7 @@ exports.RegisterUser = async (req, res) => {
 }
 
 exports.Login = async (req, res) => {
-      const payload = req.body;
+      const {payload} = req.body;
       try {
             const User = await UserModel.findOne({ phoneNumber: payload.phoneNumber });
             if (User) {
@@ -32,15 +32,15 @@ exports.Login = async (req, res) => {
                   if (isMatched) {
                         const token = Authorization.Authorize(User?._doc);
                         const response = { name: User.name, phoneNumber: User.phoneNumber, token }
-                        res.status(200).send(response)
+                        res.status(200).json({statusCode:200,message:"login success",user:response})
                   } else {
-                        res.status(401).send('invalid phone/password');
+                        res.status(401).json({statusCode:401,message:"invalid credentials"});
                   }
             } else {
-                  res.status(404).send('invalid phone');
+                  res.status(404).json({statusCode:401,message:"invalid username"});
             }
       } catch (error) {
-            res.status(404).send('invalid phone');
+            res.status(404).json(error.message);
       }
 
 }
@@ -51,12 +51,12 @@ exports.UpdateUser = async (req, res) => {
       try {
             const UpdateUser = await UserModel.findOneAndUpdate({ _id: userId }, User);
             if (UpdateUser) {
-                  res.status(200).send('user updated');
+                  res.status(200).json({statusCode:200,message:"user updated"});
             } else {
-                  res.status(404).send('user not found');
+                  res.status(404).json({statusCode:404,message:"user not found"});
             }
       } catch (error) {
-            res.status(400).send(error.message);
+            res.status(400).json(error.message);
       }
 
 }
@@ -66,12 +66,12 @@ exports.GetUser = async (req, res) => {
       try {
             const User = await UserModel.findById(userId);
             if (User) {
-                  res.status(200).send(User)
+                  res.status(200).json(User);
             } else {
-                  res.status(404).send('user not found')
+                  res.status(404).json('user not found');
             }
       } catch (error) {
-            res.status(400).send(error.message)
+            res.status(400).json(error.message);
       }
 }
 
@@ -93,24 +93,14 @@ exports.GetUsers = async (req, res) => {
                   .limit(+pageSize)
                   .exec();
             if (users && users?.length) {
-                  res.status(200).send({ users, totalCount, totalPages })
+                  res.status(200).json({ users, totalCount, totalPages })
             } else {
-                  res.status(404).send('no user found')
+                  res.status(404).json('no user found')
             }
-
       } catch (error) {
-            res.status(400).send(error.message)
+            res.status(400).json(error.message)
       }
 }
 
-exports.GetOrders = async(req,res)=>{
-//   res.set("Content-Type", "text/event-stream")
-//   res.set("Connection", "keep-alive")
-//   res.set("Cache-Control", "no-cache")
-//   res.set("Access-Control-Allow-Origin", "*")
-//   console.log("client connected to sse")
-//   setInterval(function(){
-//       res.status(200).write(`data: ${JSON.stringify('H')}\n\n`)
-//   }, 100)
-}
+
 

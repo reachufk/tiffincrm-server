@@ -3,7 +3,8 @@ const CategoryItemSchema = new mongoose.Schema({
       catagory:{type:String,required:true},
       itemName:{type:String,required:true,unique:true},
       itemPrice:{type:Number,required:true},
-      itemDiscount:{type:Number}
+      itemDiscount:{type:Number},
+      
 })
 
 CategoryItemSchema.index({ itemName: "text"});

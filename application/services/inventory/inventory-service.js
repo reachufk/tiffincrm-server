@@ -1,7 +1,6 @@
 const CatagoryModel = require('../../models/inventory/catagory-model');
 const CatagoryItemModel = require('../../models/inventory/catagoryItem-model');
 const AwsUtility = require('../../utils/aws-utils');
-const SearchAndPaginate = require('../../utils/paginator_util');
 const CheckDocument = require('../../utils/docExists_util');
 
 exports.SaveCatagory = async (req, res) => {
@@ -89,7 +88,6 @@ exports.GetCatagories = async (req, res) => {
 }
 
 exports.SaveCatagoryItem = async (req, res) => {
-      console.log('here')
       const CatagoryItem = new CatagoryItemModel(req.body);
       const catagoryID = CatagoryItem.catagory ? CatagoryItem.catagory : ''
       try {
