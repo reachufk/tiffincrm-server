@@ -1,15 +1,22 @@
 
 const OrderModel = require("../../models/order/order-model")
 const socket = require('../../../server');
+const UserModel = require("../../models/user/user-model");
 
 
 exports.PlaceOrder = async (req, res) => {
       try {
             const order = new OrderModel(req.body);
-            const { user } = req?.body
-            const savedOrder = await order.save();
-            socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
-            res.status(201).json({ statusCode: 201, message: 'order placed', order: savedOrder })
+            const { user } = req?.body;
+            const userInfo = await UserModel.findOne({_id:user},{password:0,_id:0,__v:0});
+            if (userInfo) {
+                  order.userInfo = userInfo;
+                  const savedOrder = await order.save();
+                  socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
+                  res.status(201).json({ statusCode: 201, message: 'order placed', order: savedOrder })
+            }else{
+                  res.status(404).json({ statusCode: 404, error: 'user not found' })
+            }
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error?.message })
       }
@@ -26,8 +33,7 @@ exports.GetCompletedOrders = async (req, res) => {
                   orderStatus: "completed",
                   $or: [
                         { orderAddress: { $regex: keyword, $options: 'i' } },
-                        { orderMode: { $regex: keyword, $options: 'i' } },
-                        { orderAmount: { $regex: keyword, $options: 'i' } }
+                        { orderMode: { $regex: keyword, $options: 'i' } }
                   ]
             }
             const totalCount = await OrderModel.countDocuments(query);
@@ -51,30 +57,12 @@ exports.GetCompletedOrders = async (req, res) => {
 
 exports.GetLatestOrders = async (req, res) => {
       try {
-            const orders = await OrderModel.aggregate([
-                  {
-                        $match: { orderStatus: "pending" }
-                  },
-                  {
-                        $lookup: {
-                              from: 'Users',
-                              let: { userId: '$user' },
-                              pipeline: [
-                                    { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-                                    { $project: { email: 1, phoneNumber: 1, firstName: 1, lastName: 1 } }
-                              ],
-                              as: 'userInfo'
-                        }
-                  }
-            ])
+            const orders = await OrderModel.find({ orderStatus: "pending" })
             if (orders && orders.length) {
                   res.status(200).json({ statusCode: 200, orders: orders })
             } else {
                   res.status(404).json({ statusCode: 404, message: 'empty latest orders' })
             }
-
-
-
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error.message })
       }
