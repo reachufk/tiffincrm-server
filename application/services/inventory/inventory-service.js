@@ -162,3 +162,29 @@ exports.GetCatagoryItems = async (req, res) => {
       }
 
 }
+
+exports.GetAllItems= async(req,res)=>{
+      try {
+            const { pageNo, pageSize, keyword } = req.body
+            const query = {
+                  itemName: { $regex: keyword, $options: "i" },
+            };
+            const totalCount = await CatagoryItemModel.countDocuments(query);
+            const totalPages = Math.ceil(+totalCount / +pageSize);
+            const items = await CatagoryItemModel.find(query)
+                  .skip((+pageNo - 1) * +pageSize)
+                  .limit(+pageSize)
+                  .exec();
+
+            if (items && items.length) {
+                  res.status(200).json({
+                        items, totalCount, totalPages,statusCode:200
+                  });
+            } else {
+                  res.status(204).json({ message: 'no items found',statusCode:204 });
+            }
+
+      } catch (err) {
+            res.status(500).json(err.message ? err.message : err);
+      }
+}

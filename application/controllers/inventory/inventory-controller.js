@@ -13,5 +13,6 @@ router.post('/SaveCatagoryItem',inventoryService.SaveCatagoryItem);
 router.put('/UpdateCatagoryItem',inventoryService.UpdateCatagoryItem);
 router.delete('/DeleteCatagoryItem',inventoryService.DeleteCatagoryItem);
 router.post('/GetCatagoryItems',inventoryService.GetCatagoryItems);
+router.post('/GetAllItems',inventoryService.GetAllItems);
 
 module.exports = router;

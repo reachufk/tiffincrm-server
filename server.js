@@ -30,6 +30,7 @@ io.on('connection', (socket) => {
       socket.join("order");
 });
 app.use(routes);
+
 server.listen(port, () => {console.log(`Server listening on port ${port}`)});
 const socketIoObject = io;
 module.exports.ioObject = socketIoObject;
