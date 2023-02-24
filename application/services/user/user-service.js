@@ -1,24 +1,21 @@
 const Authorization = require('../../utils/authorization_util');
 const UserModel = require('../../models/user/user-model');
-const { interval } = require('rxjs');
-const { map } = require('rxjs/internal/operators/map');
-
 exports.RegisterUser = async (req, res) => {
       const User = new UserModel(req.body);
       try {
             const UserExists = await UserModel.find({ phoneNumber: User.phoneNumber });
             if (UserExists.length) {
-                  res.status(409).send('phone number is already registered');
+                  res.status(409).json('phone number is already registered');
             } else {
                   try {
                         await User.save();
-                        res.status(201).send('user created');
+                        res.status(201).json('user created');
                   } catch (error) {
-                        res.status(500).send(error.message);
+                        res.status(500).json(error.message);
                   }
             }
       } catch (error) {
-            res.status(400).send(error.message);
+            res.status(400).json(error.message);
       }
 
 }
