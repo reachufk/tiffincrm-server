@@ -31,10 +31,10 @@ exports.Login = async (req, res) => {
                         const loggedUser = { username: User.username,email:User.email, phoneNumber: User.phoneNumber, token }
                         res.status(200).json({statusCode:200,message:"login success",user:loggedUser})
                   } else {
-                        res.status(401).json({statusCode:401,message:"invalid credentials"});
+                        res.status(200).json({statusCode:401,message:"invalid credentials"});
                   }
             } else {
-                  res.status(404).json({statusCode:401,message:"invalid username"});
+                  res.status(200).json({statusCode:404,message:"invalid username"});
             }
       } catch (error) {
             res.status(404).json(error.message);
