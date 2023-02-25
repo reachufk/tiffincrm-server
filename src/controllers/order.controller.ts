@@ -1,5 +1,5 @@
 
-// const socket = require('../../../server');
+const socket = require('../server');
 
 import { Request, Response } from "express";
 import { UserModel } from "../models/user.model";
@@ -12,7 +12,7 @@ export const createOrder = async (req: Request, res: Response) => {
         const order = new OrderModel(req.body);
         order.userInfo = res.locals;
         const updatedOrder = await order.save();
-        //   socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
+          socket.ioObject.sockets.in("order").emit("newOrder", updatedOrder);
         return res.status(201).json({
             message: 'Order created successfully',
             statusCode: 201,

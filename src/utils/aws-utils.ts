@@ -1,14 +1,14 @@
 import AWS from "aws-sdk"
-
+import { environment } from "../config/environment.config"
 const s3 = new AWS.S3({
-      accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.SECRET_ACCESS_KEY
+      accessKeyId: environment.ACCESS_KEY_ID,
+      secretAccessKey: environment.SECRET_ACCESS_KEY
 })
 
 export const uploadImageToS3 = async (imageData: any, collation: string) => {
       const { id, fileData, fileType } = imageData
       const params = {
-            Bucket: process.env.AWS_BUCKET_NAME as string,
+            Bucket: environment.AWS_BUCKET_NAME as string,
             Key: `${collation}/${id}.${fileType}`,
             Body: fileData,
             ContentEncoding: 'base64',
