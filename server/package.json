@@ -2,15 +2,17 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Tiffin Aww",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "dist/index.js",
-    "tiffinDev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "start": "dist/server.js",
+    "tiffinDev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
   },
   "keywords": [
     "Tiffin Aww"
   ],
-  "author": "Showkat Ahmad, Asif Ahmad and Younis Rasheed",
+  "author": "Asif Ahmad and Showkat Ahmad",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1318.0",
@@ -22,7 +24,9 @@
     "express-validator": "^6.15.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.2",
-    "twilio": "^4.7.2"
+    "razorpay": "^2.8.6",
+    "twilio": "^4.7.2",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

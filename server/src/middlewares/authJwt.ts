@@ -5,7 +5,7 @@ import { UserModel } from "./../models/user.model";
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers;
-    if (!authorization || !authorization.startsWith('Bearer ' || !authorization.split(' ')[1])) {
+    if (!authorization || !authorization.startsWith('Bearer ') || !authorization.split(' ')[1]) {
       return res.status(403).send({
         message: "please provide the token.",
         statusCode: 400,
