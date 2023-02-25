@@ -24,7 +24,6 @@ UserSchema.pre('save', function (next) {
    
    
    UserSchema.methods.comparePassword = async (inputPassword,hashedPassword) => {
-    console.log(this.password)
     return await bcrypt.compare(inputPassword, hashedPassword);
   };
    

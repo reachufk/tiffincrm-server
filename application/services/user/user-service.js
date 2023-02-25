@@ -21,15 +21,15 @@ exports.RegisterUser = async (req, res) => {
 }
 
 exports.Login = async (req, res) => {
-      const {payload} = req.body;
+      const {phoneNumber,password} = req.body;
       try {
-            const User = await UserModel.findOne({ phoneNumber: payload.phoneNumber });
+            const User = await UserModel.findOne({ phoneNumber: +phoneNumber });
             if (User) {
-                  const isMatched = await User.comparePassword(payload.password, User.password);
+                  const isMatched = await User.comparePassword(password, User.password);
                   if (isMatched) {
                         const token = Authorization.Authorize(User?._doc);
-                        const response = { name: User.name, phoneNumber: User.phoneNumber, token }
-                        res.status(200).json({statusCode:200,message:"login success",user:response})
+                        const loggedUser = { username: User.username,email:User.email, phoneNumber: User.phoneNumber, token }
+                        res.status(200).json({statusCode:200,message:"login success",user:loggedUser})
                   } else {
                         res.status(401).json({statusCode:401,message:"invalid credentials"});
                   }
