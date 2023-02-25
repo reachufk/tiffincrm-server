@@ -77,9 +77,9 @@ exports.GetCatagories = async (req, res) => {
       try {
             const Catagories = await CatagoryModel.find({});
             if (Catagories && Catagories.length) {
-                  res.status(200).json(Catagories)
+                  res.status(200).json({statusCode:200,data:Catagories,message:'success'})
             } else {
-                  res.status(204).send({ message: 'no catagories found', statusCode: 204 });
+                  res.status(204).json({ message: 'no catagories found', statusCode: 204 });
             }
       } catch (error) {
             res.status(400).json(error.message);
