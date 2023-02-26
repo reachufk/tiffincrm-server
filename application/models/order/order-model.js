@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const UserModel = require('../user/user-model');
 
 const ItemSchema = new mongoose.Schema({
-      itemId:{ type: String, required: [true, "itemName not passed"] },
+      itemId:{ type: String, required: [true, "item not passed"] },
+      catagory:{type:String},
       itemName: { type: String, required: [true, "itemName not passed"] },
       itemPrice:{type:String,required:[true,"itemPrice not passed"]},
       count: { type: Number, required: [true, "number of items not passed"] },
@@ -26,7 +27,7 @@ const OrderSchema = new mongoose.Schema({
 
 OrderSchema.pre('save', async function (next) {
       const order = this;
-      const { user } = req?.body;
+      const { user } = order;
       try {
             const userInfo = await UserModel.findOne({_id:user},{password:0,_id:0,__v:0});
             if(userInfo){

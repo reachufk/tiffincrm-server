@@ -7,7 +7,8 @@ const BannerSchema = new mongoose.Schema({
       capped: {
             max: 5,
             autoIndexId: true
-      }
+      },
+      timestamps:true
 });
 const BannerModel = mongoose.model('Banners', BannerSchema, 'Banners')
 module.exports = BannerModel;

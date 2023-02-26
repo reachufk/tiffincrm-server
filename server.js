@@ -20,7 +20,7 @@ mongoose.set("strictQuery", false);
 mongoose.connect(environment.databaseConnection,
       { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log("connection to database sucessfully."))
       .catch((error) => console.log(error));
-
+      
 const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = require('socket.io')(server);
@@ -31,7 +31,9 @@ io.on('connection', (socket) => {
 });
 app.use(routes);
 
-server.listen(port, () => {console.log(`Server listening on port ${port}`)});
+server.listen(port, () => {
+      console.log(`Server listening on port ${port}`)
+});
 const socketIoObject = io;
 module.exports.ioObject = socketIoObject;
 

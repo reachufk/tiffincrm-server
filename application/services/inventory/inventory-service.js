@@ -59,11 +59,11 @@ exports.DeleteCatagory = async (req, res) => {
             if (CatagoryDeleted) {
                   const fileName = CatagoryDeleted._id + '.' + CatagoryDeleted.catagoryImageType.split('/')[1]
                   const isDeleted = await AwsUtility.DeleteCatagoryImage(fileName)
-                  if(isDeleted){
+                  if (isDeleted) {
                         res.status(200).json({ message: 'catagory deletd', statusCode: 200 });
-                  }else{
-                        res.status(200).json({ message: 'catagory deletd', statusCode: 200,awsError:'image not deleted' }); 
-                  }  
+                  } else {
+                        res.status(200).json({ message: 'catagory deletd', statusCode: 200, awsError: 'image not deleted' });
+                  }
             } else {
                   res.status(404).json('catagory not found');
             }
@@ -77,7 +77,7 @@ exports.GetCatagories = async (req, res) => {
       try {
             const Catagories = await CatagoryModel.find({});
             if (Catagories && Catagories.length) {
-                  res.status(200).json({statusCode:200,data:Catagories,message:'success'})
+                  res.status(200).json({ statusCode: 200, data: Catagories, message: 'success' })
             } else {
                   res.status(204).json({ message: 'no catagories found', statusCode: 204 });
             }
@@ -115,46 +115,50 @@ exports.SaveCatagoryItem = async (req, res) => {
 }
 
 exports.UpdateCatagoryItem = async (req, res) => {
-      const CatagoryItemID = req.query.catagoryItem;
+      const CatagoryItemID = req.params.item;
       const CatagoryItem = req.body;
       const UpdateResponse = await CatagoryItemModel.findOneAndUpdate({ _id: CatagoryItemID }, CatagoryItem);
       if (UpdateResponse) {
-            res.status(200).json('catagory item updated')
+            res.status(200).json({statusCode:200,message:'success'})
       } else {
-            res.status(404).json('catagory item not found')
+            res.status(200).json({statusCode:404,message:'item not found'})
       }
 }
 
 exports.DeleteCatagoryItem = async (req, res) => {
-      const CatagoryItemID = req.query.catagoryItem;
+      const CatagoryItemID = req.params.item;
       const DeleteResponse = await CatagoryItemModel.findOneAndDelete({ _id: CatagoryItemID });
       if (DeleteResponse) {
-            res.status(200).json('catagory item deleted')
+            res.status(200).json({statusCode:200,message:'success'})
       } else {
-            res.status(404).json('catagory item not found')
+            res.status(200).json({statusCode:404,message:'item not found'})
       }
 }
 
 exports.GetCatagoryItems = async (req, res) => {
       try {
-            const { pageNo, pageSize, keyword, catagory } = req.body
+            const { pageNo, pageSize, keyword, catagory } = req.body;
+            if (!catagory) {
+                  return res.status(400).json({ message: "catagory not passed" });
+            }
             const query = {
                   catagory,
                   itemName: { $regex: keyword, $options: "i" },
             };
             const totalCount = await CatagoryItemModel.countDocuments(query);
-            const totalPages = Math.ceil(+totalCount / +pageSize);
+            const isSize = pageSize ? pageSize : totalCount;
+            const totalPages = Math.ceil(+totalCount / +isSize);
             const items = await CatagoryItemModel.find(query)
-                  .skip((+pageNo - 1) * +pageSize)
-                  .limit(+pageSize)
+                  .skip((+pageNo - 1) * +isSize)
+                  .limit(+isSize)
                   .exec();
 
             if (items && items.length) {
                   res.status(200).json({
-                        items, totalCount, totalPages,statusCode:200
+                        data:items, totalCount, totalPages, statusCode: 200
                   });
             } else {
-                  res.status(204).json({ message: 'no items found',statusCode:204 });
+                  res.status(200).json({ message: 'no items found', statusCode: 204 });
             }
 
       } catch (err) {
@@ -163,7 +167,7 @@ exports.GetCatagoryItems = async (req, res) => {
 
 }
 
-exports.GetAllItems= async(req,res)=>{
+exports.GetAllItems = async (req, res) => {
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
@@ -178,10 +182,10 @@ exports.GetAllItems= async(req,res)=>{
 
             if (items && items.length) {
                   res.status(200).json({
-                        items, totalCount, totalPages,statusCode:200
+                        items, totalCount, totalPages, statusCode: 200
                   });
             } else {
-                  res.status(204).json({ message: 'no items found',statusCode:204 });
+                  res.status(204).json({ message: 'no items found', statusCode: 204 });
             }
 
       } catch (err) {

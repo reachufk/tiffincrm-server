@@ -10,8 +10,8 @@ router.delete('/DeleteCatagory/:catagoryId',inventoryService.DeleteCatagory);
 
 //catagory items apis
 router.post('/SaveCatagoryItem',inventoryService.SaveCatagoryItem);
-router.put('/UpdateCatagoryItem',inventoryService.UpdateCatagoryItem);
-router.delete('/DeleteCatagoryItem',inventoryService.DeleteCatagoryItem);
+router.put('/UpdateCatagoryItem/:item',inventoryService.UpdateCatagoryItem);
+router.delete('/DeleteCatagoryItem/:item',inventoryService.DeleteCatagoryItem);
 router.post('/GetCatagoryItems',inventoryService.GetCatagoryItems);
 router.post('/GetAllItems',inventoryService.GetAllItems);
 
