@@ -9,7 +9,7 @@ const OrderController = require('../controllers/orders/order-controller')
 router.use('/User/',UserController);
 router.use('/Admin/',AdminController);
 router.use('/Inventory/',InventoryController);
-router.use('/Banner/',BannerController);
+router.use('/Banners/',BannerController);
 router.use('/Orders/',OrderController);
 
 module.exports = router;

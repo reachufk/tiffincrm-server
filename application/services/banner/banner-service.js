@@ -1,80 +1,89 @@
 const BannerModel = require('../../models/banner/banner-model')
-
+const AwsUtility = require('../../utils/aws-utils');
 exports.SaveBanner = async (req, res) => {
       const Banner = new BannerModel(req.body);
-      try {
-            const BannerExists = BannerModel.find({ bannerName: Banner?.bannerName });
-            if (BannerExists && BannerExists.length) {
-                  res.status(409).send('Banner already exists')
-            } else {
-                  try {
-                        await Banner.save();
-                        res.status(201).send('Banner Saved sucessfully')
-                  } catch (error) {
-                        res.status(500).send(error.message)
+      const isExists = await BannerModel.find({ bannerName: Banner?.bannerName });
+      if (isExists && isExists.length) {
+            res.status(409).json('banner name alraedy exists');
+      } else {
+            try {
+                  const banners = await BannerModel.countDocuments()
+                  if (banners == 5) {
+                        return res.status(401).json({ meessage: "ony 5 banners are allowedd" })
                   }
+                  const imageData = {
+                        fileName: Banner._id,
+                        fileType: Banner.bannerImageType?.split('/')[1],
+                        fileData: new Buffer.from(Banner?.bannerImage?.replace(/^data:image\/\w+;base64,/, ""), 'base64')
+                  }
+                  const awsImageLocation = await AwsUtility.UploadBannerImage(imageData);
+                  if (awsImageLocation) {
+                        Banner.bannerImage = awsImageLocation
+                        await Banner.save();
+                        res.status(201).json({ message: 'banner saved', statusCode: 200, data: Banner });
+                  }
+            } catch (error) {
+                  res.status(400).json(error.message);
             }
-      } catch (error) {
-            res.status(400).send(error.message)
       }
-}
-
-exports.GetBanner = async (req, res) => {
-      const BannersId = req.query.banner;
-      try {
-            const Banner = await BannerModel.findById(BannersId)
-            if (Banner) {
-                  res.status(201).send(Banner)
-            } else {
-                  res.status(404).send('not found')
-            }
-      } catch (error) {
-            res.status(400).send(error.message)
-      }
-
 }
 
 exports.GetBanners = async (req, res) => {
       try {
-            const Banners = BannerModel.find({});
+            const Banners = await BannerModel.find({});
             if (Banners && Banners.length) {
-                  res.status(201).send(Banners)
+                  res.status(200).json({ statusCode: 200, data: Banners })
             } else {
-                  res.status(404).send('data empty')
+                  res.status(204).json({ statusCode: 204, message: 'no banner found' })
             }
       } catch (error) {
-            res.status(400).send(error.message)
+            res.status(400).json(error.message)
       }
 
 }
 
 exports.UpdateBanner = async (req, res) => {
       const Banner = req.body;;
-      const BannerID = req.query.banner;
+      const BannerID = req.params.banner;
       try {
-            isExists = await BannerModel.findOneAndUpdate({ _id: BannerID }, Banner)
-            if (isExists) {
-                  res.status(200).send("Banner Updated")
+            if (Banner?.bannerImage?.includes('base64')) {
+                  const imageData = {
+                        fileName: Banner._id,
+                        fileType: Banner.bannerImageType,
+                        fileData: new Buffer.from(Banner?.bannerImage?.replace(/^data:image\/\w+;base64,/, ""), 'base64')
+                  }
+                  const awsImageLocation = await AwsUtility.UploadBannerImage(imageData);
+                  Banner.bannerImage = awsImageLocation
+            }
+            const bannerUpdated = await BannerModel.findOneAndUpdate({ _id: BannerID }, Banner);
+            if (bannerUpdated) {
+                  res.status(200).json({ message: 'banner updated', statusCode: 200, data: bannerUpdated });
             } else {
-                  res.status(404).send("Banner not found")
+                  res.status(404).json('banner not found');
             }
       } catch (error) {
-            res.status(400).send(error.message)
+            res.status(400).json(error.message);
       }
 
 }
 
 exports.DeleteBanner = async (req, res) => {
-      const BannerID = req.query.banner;
+      const BannerID = req.params.banner;
       try {
-            isDeleted = await BannerModel.findOneAndDelete({ _id: BannerID })
-            if (isDeleted) {
-                  res.status(200).send("Banner deleted")
+            const BannerDeleted = await BannerModel.findByIdAndDelete(BannerID);
+            if (BannerDeleted) {
+                  const fileName = BannerDeleted._id + '.' + BannerDeleted.bannerImageType.split('/')[1]
+                  const isDeleted = await AwsUtility.DeleteBannerImage(fileName)
+                  if (isDeleted) {
+                        res.status(200).json({ message: 'banner deletd', statusCode: 200 });
+                  } else {
+                        res.status(209).json({ message: 'banner deletd', statusCode: 209, awsError: 'image not deleted' });
+                  }
             } else {
-                  res.status(404).send("Banner not found")
+                  res.status(404).json('banner not found');
             }
       } catch (error) {
-            res.status(400).send(error.message)
+            res.status(404).json(error.message);
       }
 
 } 

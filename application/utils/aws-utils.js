@@ -26,6 +26,26 @@ const UploadCatagoryImage = async ({ fileName, fileType, fileData }) => {
       }
 }
 
+const UploadBannerImage = async ({ fileName, fileType, fileData }) => {
+      const params = {
+            Bucket: config.Aws_Bucket_Name,
+            Key: `BannerImages/${fileName+'.'+fileType}`,
+            Body: fileData,
+            ContentEncoding: 'base64',
+            ContentType: `image/${fileType}`
+      }
+      try {
+            const upload = await s3.upload(params).promise();
+            if (upload.Location){
+                  return upload.Location
+            }else{
+                  return false
+            }          
+      } catch (error) {
+            throw error;
+      }
+}
+
 const DeleteCatagoryImage = async (fileName) => {
       const params = {
             Bucket: config.Aws_Bucket_Name,
@@ -43,4 +63,21 @@ const DeleteCatagoryImage = async (fileName) => {
       }
 }
 
-module.exports = { UploadCatagoryImage,DeleteCatagoryImage }
+const DeleteBannerImage = async (fileName) => {
+      const params = {
+            Bucket: config.Aws_Bucket_Name,
+            Key: `BannerImages/${fileName}`,
+      }
+      try {
+            const isDeleted = await s3.deleteObject(params).promise();
+            if (isDeleted){
+                  return true
+            }else{
+                  return false
+            }          
+      } catch (error) {
+            throw error;
+      }
+}
+
+module.exports = { UploadCatagoryImage,DeleteCatagoryImage,UploadBannerImage,DeleteBannerImage }
