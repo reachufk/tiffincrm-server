@@ -11,7 +11,7 @@ exports.RegisterUser = async (req, res) => {
             } else {
                   try {
                         await User.save();
-                        res.status(201).json('user created');
+                        res.status(201).json({statusCode:200,message:'Account created sucessfully!...'});
                   } catch (error) {
                         res.status(500).json(error.message);
                   }
