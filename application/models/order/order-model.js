@@ -6,6 +6,8 @@ const ItemSchema = new mongoose.Schema({
       catagory:{type:String},
       itemName: { type: String, required: [true, "itemName not passed"] },
       itemPrice:{type:String,required:[true,"itemPrice not passed"]},
+      itemTypes:[],
+      selectedItemType:{type:Object},
       count: { type: Number, required: [true, "number of items not passed"] },
 }, { _id: false });
 
