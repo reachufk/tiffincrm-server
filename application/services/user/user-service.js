@@ -124,8 +124,6 @@ exports.AddCartItem = async (req, res) => {
       const { user } = req.params;
       const item = req.body
       try {
-            const User = await UserModel.findById(user);
-            if (User) {
                   const userCart = await UserCartModel.findOne({ user: user })
                   if (!userCart) {
                         const newCart = new UserCartModel({ user, cartItems: [] });
@@ -140,9 +138,7 @@ exports.AddCartItem = async (req, res) => {
                         { new: true }
                   );
                   res.status(200).json({ statusCode: 200, data: addedToCart, message: 'cart item added' });
-            } else {
-                  res.status(200).json({ statusCode: 404, message: 'user not found' });
-            }
+            
       } catch (error) {
             res.status(400).json(error.message);
       }
@@ -151,14 +147,13 @@ exports.RemoveCartItem = async (req, res) => {
       const { user } = req.params;
       const item = req.body;
       try {
-            const itemRemoved = await UserCartModel.findOneAndUpdate({ user },
-                  { $pull: { cartItems: { itemId: item.itemId } } },
-                  { new: true }
+            const itemRemoved = await UserCartModel.findOneAndUpdate({ user:user },
+                  { $pull: { cartItems: { itemId: item.itemId } } }
             );
             if (itemRemoved) {
                   res.status(200).json({ statusCode: 200, message: 'item removed', data: item?.itemId });
             } else {
-                  res.status(200).json({ statusCode: 404, message: 'item not removed' });
+                  res.status(200).json({ statusCode: 404, message: 'item not found' });
             }
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error.message });
