@@ -78,14 +78,36 @@ exports.GetCompletedOrders = async (req, res) => {
             if (orders && orders?.length) {
                   res.status(200).json({ statusCode: 200, orders, totalCount, totalPages })
             } else {
-                  res.status(404).json('no order found')
+                  res.status(200).json({ statusCode: 404, message: 'no orders found' })
             }
       } catch (error) {
             res.status(400).json(error.message)
       }
+}
 
-
-
+exports.SetCompletedOrder = async (req, res) => {
+      const { orderId } = req.params
+      try {
+            const existCompleted = await CompletedOrderModel.findOne({ _id: orderId });
+            if (existCompleted) {
+                  return res.status(200).json({ statusCode: 409, message: 'order already completed' })
+            }
+            let order = await OrderModel.findById(orderId);
+            order.orderStatus = 'completed';
+            let completedOrder = new CompletedOrderModel(order);
+            completedOrder._id = orderId
+            const isSaved = await completedOrder.save();
+            if (!isSaved) {
+                  return res.status(500).json({ statusCode: 500, message: 'failed to save' })
+            }
+            const deleteFromOrders = await OrderModel.findByIdAndDelete(orderId)
+            if (!deleteFromOrders) {
+                  return res.status(200).json({ statusCode: 200, message: 'failed to delete order from orders' })
+            }
+            return res.status(200).json({ statusCode: 200, message: 'order processed to complete' })
+      } catch (error) {
+            res.status(400).json(error.message)
+      }
 }
 
 exports.GetLatestOrders = async (req, res) => {
@@ -135,14 +157,14 @@ exports.GetAdminOrders = async (req, res) => {
 exports.GetUserOrders = async (req, res) => {
       const { user } = req.params;
       try {
-            const userOrders = await OrderModel.find({user});
-            if(userOrders && userOrders.length){
-                  res.status(200).json({statusCode:200,data:userOrders,message:'success'})
-            }else{
-                  res.status(200).json({statusCode:404,message:'no orders made for user'})
+            const userOrders = await OrderModel.find({ user });
+            if (userOrders && userOrders.length) {
+                  res.status(200).json({ statusCode: 200, data: userOrders, message: 'success' })
+            } else {
+                  res.status(200).json({ statusCode: 404, message: 'no orders made for user' })
             }
       } catch (error) {
-            res.status(400).json({statusCode:400,message:res.message})
+            res.status(400).json({ statusCode: 400, message: res.message })
       }
 }
 
