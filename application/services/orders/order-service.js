@@ -1,5 +1,6 @@
 const config = require('../../../config/config')
 const OrderModel = require("../../models/order/order-model");
+const CompletedOrderModel = require("../../models/order/completed-order-model");
 const AdminOrderModel = require('../../models/order/admin-order-model')
 const socket = require('../../../server');
 const Razorpay = require('razorpay');
@@ -63,15 +64,14 @@ exports.GetCompletedOrders = async (req, res) => {
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
-                  orderStatus: "completed",
                   $or: [
                         { orderAddress: { $regex: keyword, $options: 'i' } },
                         { orderMode: { $regex: keyword, $options: 'i' } }
                   ]
             }
-            const totalCount = await OrderModel.countDocuments(query);
+            const totalCount = await CompletedOrderModel.countDocuments(query);
             const totalPages = Math.ceil(+totalCount / +pageSize);
-            const orders = await OrderModel.find(query)
+            const orders = await CompletedOrderModel.find(query)
                   .skip((+pageNo - 1) * +pageSize)
                   .limit(+pageSize)
                   .exec();

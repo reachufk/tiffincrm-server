@@ -124,24 +124,23 @@ exports.AddCartItem = async (req, res) => {
       const { user } = req.params;
       const item = req.body
       try {
-                  const userCart = await UserCartModel.findOne({ user: user })
-                  if (!userCart) {
-                        const newCart = new UserCartModel({ user, cartItems: [] });
-                        await newCart.save();
-                  }
-                  const isExists = await UserCartModel.findOne({ user, cartItems: { $elemMatch: { itemId: item.itemId } } });;
-                  if (isExists) {
-                        return res.status(200).json({ statusCode: 409, message: 'item already exists in cart' })
-                  }
-                  const addedToCart = await UserCartModel.findOneAndUpdate({ user },
-                        { $push: { cartItems: item } },
-                        { new: true }
-                  );
-                  res.status(200).json({ statusCode: 200, data: addedToCart, message: 'cart item added' });
-            
-      } catch (error) {
-            res.status(400).json(error.message);
-      }
+            let cart = await UserCartModel.findOne({ user });
+            if (!cart) {
+              cart = await UserCartModel.create({ user, cartItem: [] });
+            }
+            const existingItemIndex = cart.cartItems.findIndex(
+              (existed) => existed.itemId === item.itemId
+            );
+            if (existingItemIndex !== -1) {
+                return  res.status(200).json({ statusCode: 409, message: 'item already exists in your cart'});
+            } else {
+              cart.cartItems.push(item);
+              await cart.save();
+              return  res.status(200).json({ statusCode: 200, message: 'item added to cart'});
+            }
+          } catch (error) {
+            res.status(400).json({ statusCode: 400, message: error.message});
+          }
 }
 exports.RemoveCartItem = async (req, res) => {
       const { user } = req.params;
@@ -178,7 +177,6 @@ exports.UpdateCartItem = async (req, res) => {
             res.status(400).json({statusCode:400,message:error.message})
       }
       
-
 }
 
 

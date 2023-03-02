@@ -6,7 +6,8 @@ const ItemTypesSchema = new mongoose.Schema({
 }, { _id: false });
 
 const ItemSchema = new mongoose.Schema({
-      itemId:{ type: String, required: [true, "item not passed"],unique:true },
+      _id:{type:mongoose.Types.ObjectId},
+      itemId:{ type: String, required: [true, "item not passed"] },
       catagory:{type:String},
       isVeg:{type:Boolean},
       itemName: { type: String, required: [true, "itemName not passed"] },
@@ -15,12 +16,14 @@ const ItemSchema = new mongoose.Schema({
       itemInstructions:{type:String},
       itemPrice:{type:String,required:[true,"itemPrice not passed"]},
       count: { type: Number, required: [true, "number of items not passed"] },
-}, { _id: false });
+});
 
 const UserCartSchema = new mongoose.Schema({
-     user: { type: String,required:true },
+     user: { type: String,required:true ,unique:[true,'user cart already exists']},
      cartItems:[ItemSchema]
 },{timestamps:true})
+
+
 
 const UserCartModel = mongoose.model('UserCart', UserCartSchema, 'UserCart')
 module.exports = UserCartModel;
