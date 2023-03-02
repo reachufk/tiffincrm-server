@@ -30,32 +30,32 @@ exports.PlaceAdminOrder = async (req, res) => {
       }
 }
 
-exports.CreateRpayOrder = async(req,res)=>{
+exports.CreateRpayOrder = async (req, res) => {
       const options = req.body
       try {
-            const createdOrder = await  instance.orders.create(options);
-            if(!createdOrder){
-                  return res.status(500).json({message:'payment gateway error'})
+            const createdOrder = await instance.orders.create(options);
+            if (!createdOrder) {
+                  return res.status(500).json({ message: 'payment gateway error' })
             }
-             res.status(200).json({ statusCode: 200, data: createdOrder })
+            res.status(200).json({ statusCode: 200, data: createdOrder })
       } catch (error) {
-            res.status(400).json({ statusCode: 200, message:error.message })
+            res.status(400).json({ statusCode: 200, message: error.message })
       }
-    
+
 }
 
-exports.VerifyPayment = async(req, res) => {
-      const {razorpay_order_id,razorpay_payment_id} = req.body
+exports.VerifyPayment = async (req, res) => {
+      const { razorpay_order_id, razorpay_payment_id } = req.body
       let body = razorpay_order_id + "|" + razorpay_payment_id;
       var crypto = require("crypto");
       var expectedSignature = crypto.createHmac('sha256', config.Razorpay_Key_Secret)
             .update(body.toString())
             .digest('hex');
-      if (expectedSignature === req.body.razorpay_signature){
+      if (expectedSignature === req.body.razorpay_signature) {
             const paymentData = await instance.payments.fetch(razorpay_payment_id)
-            res.status(200).json({statusCode:200,verified:true,data:paymentData})
-      }else{
-            res.status(200).json({statusCode:401,verified:false})
+            res.status(200).json({ statusCode: 200, verified: true, data: paymentData })
+      } else {
+            res.status(200).json({ statusCode: 401, verified: false })
       }
 }
 
@@ -132,5 +132,18 @@ exports.GetAdminOrders = async (req, res) => {
 }
 
 
+exports.GetUserOrders = async (req, res) => {
+      const { user } = req.params;
+      try {
+            const userOrders = await OrderModel.find({user});
+            if(userOrders && userOrders.length){
+                  res.status(200).json({statusCode:200,data:userOrders,message:'success'})
+            }else{
+                  res.status(200).json({statusCode:404,message:'no orders made for user'})
+            }
+      } catch (error) {
+            res.status(400).json({statusCode:400,message:res.message})
+      }
+}
 
 

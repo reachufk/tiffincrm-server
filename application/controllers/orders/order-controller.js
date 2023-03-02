@@ -9,5 +9,6 @@ router.post('/PlaceAdminOrder',orderService.PlaceAdminOrder);
 router.post('/GetCompletedOrders',orderService.GetCompletedOrders);
 router.get('/GetLatestOrders',orderService.GetLatestOrders);
 router.post('/GetAdminOrders',orderService.GetAdminOrders);
+router.get('/GetUserOrders/:user',orderService.GetUserOrders);
 
 module.exports = router;
