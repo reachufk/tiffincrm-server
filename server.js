@@ -23,7 +23,11 @@ mongoose.connect(environment.databaseConnection,
       
 const port = process.env.PORT || 3000;
 const server = http.createServer(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 io.on('connection', (socket) => {
       console.log('A client has connected');

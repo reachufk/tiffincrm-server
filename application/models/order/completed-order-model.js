@@ -11,7 +11,8 @@ const ItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const CompletedOrderSchema = new mongoose.Schema({
-      user: { type: mongoose.Types.ObjectId },
+      prevOrderId:{ type: String, required: true ,unique:true},
+      user: { type: String },
       orderAddress: { type: String, required: true },
       orderAmount: { type: Number, required: true },
       orderMode: { type: String, required: [true, "must be either online or offline"] },
@@ -25,6 +26,7 @@ const CompletedOrderSchema = new mongoose.Schema({
       orderStatus: { type: String, required: [true, "must be either completed"] },
 },{ timestamps: true });
 
+CompletedOrderSchema.index({ prevOrderId: 1 });
 
 const CompletedOrderModel = mongoose.model('CompletedOrders', CompletedOrderSchema, 'CompletedOrderModel')
 module.exports = CompletedOrderModel;

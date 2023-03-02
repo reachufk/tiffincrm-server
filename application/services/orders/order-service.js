@@ -86,16 +86,17 @@ exports.GetCompletedOrders = async (req, res) => {
 }
 
 exports.SetCompletedOrder = async (req, res) => {
-      const { orderId } = req.params
+      const { orderId } = req.params;
+      let order = req.body;
       try {
-            const existCompleted = await CompletedOrderModel.findOne({ _id: orderId });
+            const existCompleted = await CompletedOrderModel.findOne({ prevOrderId: orderId });
             if (existCompleted) {
                   return res.status(200).json({ statusCode: 409, message: 'order already completed' })
             }
-            let order = await OrderModel.findById(orderId);
+            delete order._id;
+            order.prevOrderId = orderId;
             order.orderStatus = 'completed';
-            let completedOrder = new CompletedOrderModel(order);
-            completedOrder._id = orderId
+            const completedOrder = new CompletedOrderModel(order)
             const isSaved = await completedOrder.save();
             if (!isSaved) {
                   return res.status(500).json({ statusCode: 500, message: 'failed to save' })
