@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const {verifyUser,verifyAdmin,verifySuperAdmin} = require('../../middlewares/authMiddleware')
 const userService = require('../../services/user/user-service');
 
 router.post('/RegisterUser',userService.RegisterUser)
 router.post('/Login',userService.Login);
-router.put('/UpdateUser',userService.Login);
-router.get('/GetUser',userService.GetUser);
-router.post('/GetUsers',userService.GetUsers);
+router.put('/UpdateUser/:user',verifyUser,userService.UpdateUser);
+router.get('/GetUser',verifyUser,userService.GetUser);
+router.post('/GetUsers',verifySuperAdmin,userService.GetUsers);
 
-router.get('/GetCart/:user',userService.GetCart);
-router.post('/AddCartItem/:user',userService.AddCartItem);
-router.post('/RemoveCartItem/:user',userService.RemoveCartItem);
-router.put('/UpdateCartItem/:user',userService.UpdateCartItem);
+router.get('/GetCart/:user',verifyUser,userService.GetCart);
+router.post('/AddCartItem/:user',verifyUser,userService.AddCartItem);
+router.post('/RemoveCartItem/:user',verifyUser,userService.RemoveCartItem);
+router.put('/UpdateCartItem/:user',verifyUser,userService.UpdateCartItem);
 module.exports = router;

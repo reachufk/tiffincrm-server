@@ -1,5 +1,7 @@
 module.exports = {
-      "SecretKey": "chilaikalaan",
+      "SecretKey": "cavenDar",
+      "SecretKeyAdmin": "fourSquare",
+      "SecretKeySuperAdmin": "goldFlake",
       "Aws_Bucket_Name": "tiffin-storage",
       "databaseConnection": "mongodb+srv://Asif:Asif.chap111@tiffinaawdb.owxh4.mongodb.net/TiffinAawDB",
       "BUCKET_USER_ACCESS_KEY":"AKIAWAU2OY5YFUZRNN5C",

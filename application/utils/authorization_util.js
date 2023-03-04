@@ -1,16 +1,42 @@
 const jwt = require('jsonwebtoken')
-const secretKey = 'secretkey';
+const config = require('../../config/config')
 
- const Authorize = (payload) => {
-      return jwt.sign(payload, secretKey, { expiresIn: '2h' });
+const authorizeUser = (payload) => {
+      return jwt.sign(payload, config.SecretKey, { expiresIn: "2h" });
 };
-
- const isAuthorized = (token) => {
+const authorizeAdmin = (payload) => {
+      return jwt.sign(payload, config.SecretKeyAdmin, { expiresIn: '2h' });
+}
+const authorizeSuperAdmin = (payload) => {
+      return jwt.sign(payload, config.SecretKeyAdmin, { expiresIn: '2h' });
+}
+const isUserAuthorized = (token) => {
       try {
-            return jwt.verify(token, secretKey);
+            return jwt.verify(token, config.SecretKey);
+      } catch (err) {
+            return false;
+      }
+};
+const isAdminAuthorized = (token) => {
+      try {
+            return jwt.verify(token, config.SecretKeyAdmin);
+      } catch (err) {
+            return false;
+      }
+};
+const isSuperAdminAuthorized = (token) => {
+      try {
+            return jwt.verify(token, config.SecretKeySuperAdmin);
       } catch (err) {
             return false;
       }
 };
 
-module.exports = {Authorize,isAuthorized}
+module.exports = {
+      authorizeUser,
+      isUserAuthorized,
+      isAdminAuthorized,
+      authorizeAdmin,
+      authorizeSuperAdmin,
+      isSuperAdminAuthorized
+}

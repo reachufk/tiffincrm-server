@@ -11,7 +11,7 @@ exports.RegisterUser = async (req, res) => {
             } else {
                   try {
                         await User.save();
-                        res.status(201).json({statusCode:200,message:'Account created sucessfully!...'});
+                        res.status(201).json({ statusCode: 200, message: 'Account created sucessfully!...' });
                   } catch (error) {
                         res.status(500).json(error.message);
                   }
@@ -19,7 +19,6 @@ exports.RegisterUser = async (req, res) => {
       } catch (error) {
             res.status(400).json(error.message);
       }
-
 }
 
 exports.Login = async (req, res) => {
@@ -28,25 +27,36 @@ exports.Login = async (req, res) => {
             const User = await UserModel.findOne({ phoneNumber: +phoneNumber });
             if (User) {
                   const isMatched = await User.comparePassword(password, User.password);
-                  if (isMatched) {
-                        const token = Authorization.Authorize(User?._doc);
-                        const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, token }
-                        res.status(200).json({ statusCode: 200, message: "login success", user: loggedUser })
-                  } else {
-                        res.status(200).json({ statusCode: 401, message: "invalid credentials" });
+                  if (!isMatched) {
+                        return res.status(200).json({ statusCode: 401, message: "invalid credentials" });
                   }
+                  let token = '';
+                  const { username, phoneNumber, role } = User
+                  if (role == 'user') {
+                        token = Authorization.authorizeUser({username, phoneNumber, role});
+                  } else {
+                        if (role == 'admin') {
+                              //admin
+                              token = Authorization.authorizeAdmin({username, phoneNumber, role});
+                        } else {
+                              //super admin
+                              token = Authorization.authorizeSuperAdmin({username, phoneNumber, role});
+                        }
+                  }
+                  const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token }
+                  res.status(200).json({ statusCode: 200, message: "login success", user: loggedUser })
             } else {
                   res.status(200).json({ statusCode: 404, message: "invalid username" });
             }
       } catch (error) {
-            res.status(404).json(error.message);
+            res.status(400).json(error.message);
       }
 
 }
 
 exports.UpdateUser = async (req, res) => {
       const User = req.body;
-      const userId = req.query.user
+      const userId = req.params.user
       try {
             const UpdateUser = await UserModel.findOneAndUpdate({ _id: userId }, User);
             if (UpdateUser) {
@@ -126,27 +136,27 @@ exports.AddCartItem = async (req, res) => {
       try {
             let cart = await UserCartModel.findOne({ user });
             if (!cart) {
-              cart = await UserCartModel.create({ user, cartItem: [] });
+                  cart = await UserCartModel.create({ user, cartItem: [] });
             }
             const existingItemIndex = cart.cartItems.findIndex(
-              (existed) => existed.itemId === item.itemId
+                  (existed) => existed.itemId === item.itemId
             );
             if (existingItemIndex !== -1) {
-                return  res.status(200).json({ statusCode: 409, message: 'item already exists in your cart'});
+                  return res.status(200).json({ statusCode: 409, message: 'item already exists in your cart' });
             } else {
-              cart.cartItems.push(item);
-              await cart.save();
-              return  res.status(200).json({ statusCode: 200, message: 'item added to cart'});
+                  cart.cartItems.push(item);
+                  await cart.save();
+                  return res.status(200).json({ statusCode: 200, message: 'item added to cart' });
             }
-          } catch (error) {
-            res.status(400).json({ statusCode: 400, message: error.message});
-          }
+      } catch (error) {
+            res.status(400).json({ statusCode: 400, message: error.message });
+      }
 }
 exports.RemoveCartItem = async (req, res) => {
       const { user } = req.params;
       const item = req.body;
       try {
-            const itemRemoved = await UserCartModel.findOneAndUpdate({ user:user },
+            const itemRemoved = await UserCartModel.findOneAndUpdate({ user: user },
                   { $pull: { cartItems: { itemId: item.itemId } } }
             );
             if (itemRemoved) {
@@ -162,21 +172,21 @@ exports.RemoveCartItem = async (req, res) => {
 
 exports.UpdateCartItem = async (req, res) => {
       const { user } = req.params;
-      const item = req.body; 
+      const item = req.body;
       try {
             const updatedCart = await UserCartModel.findOneAndUpdate(
                   { user, 'cartItems.itemId': item?.itemId },
                   { $set: { 'cartItems.$': item } },
                   { new: true }
             );
-            if(!updatedCart){
-                 return res.status(200).json({statusCode:404,message:'cart not found'})
+            if (!updatedCart) {
+                  return res.status(200).json({ statusCode: 404, message: 'cart not found' })
             }
-            res.status(200).json({statusCode:200,message:'cart item updated',update:updatedCart})
+            res.status(200).json({ statusCode: 200, message: 'cart item updated', update: updatedCart })
       } catch (error) {
-            res.status(400).json({statusCode:400,message:error.message})
+            res.status(400).json({ statusCode: 400, message: error.message })
       }
-      
+
 }
 
 

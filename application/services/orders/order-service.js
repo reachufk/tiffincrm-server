@@ -112,10 +112,11 @@ exports.SetCompletedOrder = async (req, res) => {
 }
 
 exports.GetLatestOrders = async (req, res) => {
+     const currentDate  = new Date().toISOString().slice(0, 10);
       try {
-            const orders = await OrderModel.find({ orderStatus: "pending" })
+            const orders = await OrderModel.find({ orderStatus: "pending",orderDeliveryTime:{$regex:currentDate} })
             if (orders && orders.length) {
-                  res.status(200).json({ statusCode: 200, orders: orders })
+                  res.status(200).json({ statusCode: 200, data: orders })
             } else {
                   res.status(404).json({ statusCode: 404, message: 'empty latest orders' })
             }
@@ -125,6 +126,23 @@ exports.GetLatestOrders = async (req, res) => {
 
 }
 
+exports.GetFutureOrders = async(req,res)=>{
+      const currentDate  = new Date().toISOString().slice(0, 10);
+      try {
+            const orders = await OrderModel.find({ orderStatus: "pending" })
+            if (orders && orders.length) {
+                  const futureOrders = orders.filter((order) => {
+                        const deliveryDate = order.orderDeliveryTime.slice(0,10)
+                        return deliveryDate !== currentDate;
+                  });
+                      return res.status(200).json({ statusCode: 200, data :futureOrders ,message: 'success' })
+            } else {
+                  res.status(200).json({ statusCode: 404, message: 'empty latest orders' })
+            }
+      } catch (error) {
+            res.status(400).json({ statusCode: 400, error: error.message })
+      }
+}
 
 exports.GetAdminOrders = async (req, res) => {
       try {

@@ -28,5 +28,5 @@ const CompletedOrderSchema = new mongoose.Schema({
 
 CompletedOrderSchema.index({ prevOrderId: 1 });
 
-const CompletedOrderModel = mongoose.model('CompletedOrders', CompletedOrderSchema, 'CompletedOrderModel')
+const CompletedOrderModel = mongoose.model('CompletedOrders', CompletedOrderSchema, 'CompletedOrders')
 module.exports = CompletedOrderModel;
