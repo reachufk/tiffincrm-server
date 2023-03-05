@@ -1,19 +1,23 @@
 const Authorization = require('../../utils/authorization_util');
 const UserModel = require('../../models/user/user-model');
 const UserCartModel = require('../../models/user/user-cart-model')
+const { sendSMS, verifyOTP } = require('./../../utils/sendSMS');
 
 exports.RegisterUser = async (req, res) => {
-      const User = new UserModel(req.body);
       try {
-            const UserExists = await UserModel.find({ phoneNumber: User.phoneNumber });
+            const { phoneNumber } = req.body;
+            const UserExists = await UserModel.find({ phoneNumber });
             if (UserExists.length) {
                   res.status(409).json('phone number is already registered');
             } else {
                   try {
-                        await User.save();
-                        res.status(201).json({ statusCode: 200, message: 'Account created sucessfully!...' });
+                        const status = await sendSMS(phoneNumber);
+                        if (status !== 'pending') {
+                              return res.status(500).json({ statusCode: 500, message: 'Something went wrong.' });
+                        }
+                        return res.status(200).json({ statusCode: 200, message: 'SMS sent successfully.' });
                   } catch (error) {
-                        res.status(500).json(error.message);
+                        return res.status(500).json(error.message);
                   }
             }
       } catch (error) {
@@ -33,14 +37,14 @@ exports.Login = async (req, res) => {
                   let token = '';
                   const { username, phoneNumber, role } = User
                   if (role == 'user') {
-                        token = Authorization.authorizeUser({username, phoneNumber, role});
+                        token = Authorization.authorizeUser({ username, phoneNumber, role });
                   } else {
                         if (role == 'admin') {
                               //admin
-                              token = Authorization.authorizeAdmin({username, phoneNumber, role});
+                              token = Authorization.authorizeAdmin({ username, phoneNumber, role });
                         } else {
                               //super admin
-                              token = Authorization.authorizeSuperAdmin({username, phoneNumber, role});
+                              token = Authorization.authorizeSuperAdmin({ username, phoneNumber, role });
                         }
                   }
                   const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token }
@@ -51,7 +55,21 @@ exports.Login = async (req, res) => {
       } catch (error) {
             res.status(400).json(error.message);
       }
+}
 
+exports.VerifyUsersOTP = async (req, res) => {
+      const { phoneNumber, otp } = req.body;
+      try {
+            const valid = await verifyOTP(phoneNumber, otp);
+            if (!valid) {
+                  return res.status(400).json({ statusCode: 400, message: 'Invalid OPT.' });
+            }
+            const User = new UserModel(req.body);
+            await User.save();
+            return res.status(201).json({ statusCode: 201, message: 'User registered successfully.' });
+      } catch (error) {
+            return res.status(500).json(error.message);
+      }
 }
 
 exports.UpdateUser = async (req, res) => {
