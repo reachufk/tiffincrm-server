@@ -17,7 +17,7 @@ exports.RegisterUser = async (req, res) => {
                         }
                         return res.status(200).json({ statusCode: 200, message: 'SMS sent successfully.' });
                   } catch (error) {
-                        return res.status(500).json(error.message);
+                        return res.status(400).json(error.message);
                   }
             }
       } catch (error) {
