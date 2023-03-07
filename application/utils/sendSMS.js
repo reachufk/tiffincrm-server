@@ -2,7 +2,7 @@ const twillo = require("twilio");
 const { exit } = require("process");
 
 const accountSid = "AC58046bde8ac79ab9d5c94c8f8dac5020";
-const authToken = "ffde8c40944bf74d19f3a0286d69bf5f"
+const authToken = "a0ff90cf13e57cc9a2bd2fe653a2efbc"
 const verifySid = "VAc9eb3a798b214550a05a00eb2c684c8e"
 
 if (!accountSid || !authToken || !verifySid) {
