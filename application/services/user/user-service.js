@@ -28,7 +28,7 @@ exports.RegisterUser = async (req, res) => {
 exports.Login = async (req, res) => {
       const { phoneNumber, password } = req.body;
       try {
-            const User = await UserModel.findOne({ phoneNumber: +phoneNumber });
+            const User = await UserModel.findOne({ phoneNumber: phoneNumber });
             if (User) {
                   const isMatched = await User.comparePassword(password, User.password);
                   if (!isMatched) {
@@ -58,15 +58,18 @@ exports.Login = async (req, res) => {
 }
 
 exports.VerifyUsersOTP = async (req, res) => {
-      const { phoneNumber, otp } = req.body;
+      const { signupData, otp } = req.body;
       try {
-            const valid = await verifyOTP(phoneNumber, otp);
+            const valid = await verifyOTP(signupData.phoneNumber, otp);
             if (!valid) {
-                  return res.status(400).json({ statusCode: 400, message: 'Invalid OPT.' });
+                  return res.status(200).json({ statusCode: 400, message: 'Invalid OPT.' });
             }
-            const User = new UserModel(req.body);
+            const User = new UserModel(signupData);
             await User.save();
-            return res.status(201).json({ statusCode: 201, message: 'User registered successfully.' });
+            const { username, phoneNumber, role } = User
+           const token = Authorization.authorizeUser({ username, phoneNumber, role });
+           const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token }
+            return res.status(200).json({ statusCode: 201, message: 'User registered successfully.',data:loggedUser });
       } catch (error) {
             return res.status(500).json(error.message);
       }

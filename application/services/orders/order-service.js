@@ -1,7 +1,8 @@
 const config = require('../../../config/config')
 const OrderModel = require("../../models/order/order-model");
 const CompletedOrderModel = require("../../models/order/completed-order-model");
-const AdminOrderModel = require('../../models/order/admin-order-model')
+const AdminOrderModel = require('../../models/order/admin-order-model');
+const UserCartModel = require('../../models/user/user-cart-model')
 const socket = require('../../../server');
 const Razorpay = require('razorpay');
 var instance = new Razorpay({
@@ -14,6 +15,7 @@ exports.PlaceOrder = async (req, res) => {
       try {
             const order = new OrderModel(body);
             const savedOrder = await order.save();
+            await UserCartModel.findOneAndUpdate({user:body.user},{$set:{cartItems:[]}});
             socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
             res.status(201).json({ statusCode: 201, message: 'order placed', order: savedOrder });
       } catch (error) {
@@ -112,9 +114,9 @@ exports.SetCompletedOrder = async (req, res) => {
 }
 
 exports.GetLatestOrders = async (req, res) => {
-     const currentDate  = new Date().toISOString().slice(0, 10);
+      const currentDate = new Date().toISOString().slice(0, 10);
       try {
-            const orders = await OrderModel.find({ orderStatus: "pending",orderDeliveryTime:{$regex:currentDate} })
+            const orders = await OrderModel.find({ orderStatus: "pending", orderDeliveryTime: { $regex: currentDate } })
             if (orders && orders.length) {
                   res.status(200).json({ statusCode: 200, data: orders })
             } else {
@@ -126,16 +128,16 @@ exports.GetLatestOrders = async (req, res) => {
 
 }
 
-exports.GetFutureOrders = async(req,res)=>{
-      const currentDate  = new Date().toISOString().slice(0, 10);
+exports.GetFutureOrders = async (req, res) => {
+      const currentDate = new Date().toISOString().slice(0, 10);
       try {
             const orders = await OrderModel.find({ orderStatus: "pending" })
             if (orders && orders.length) {
                   const futureOrders = orders.filter((order) => {
-                        const deliveryDate = order.orderDeliveryTime.slice(0,10)
+                        const deliveryDate = order.orderDeliveryTime.slice(0, 10)
                         return deliveryDate !== currentDate;
                   });
-                      return res.status(200).json({ statusCode: 200, data :futureOrders ,message: 'success' })
+                  return res.status(200).json({ statusCode: 200, data: futureOrders, message: 'success' })
             } else {
                   res.status(200).json({ statusCode: 404, message: 'empty latest orders' })
             }
