@@ -9,7 +9,16 @@ router.post('/verify-otp', userService.VerifyUsersOTP);
 router.post('/Login', userService.Login);
 router.put('/UpdateUser/:user', verifyUser, userService.UpdateUser);
 router.get('/GetUser', verifyUser, userService.GetUser);
-router.post('/GetUsers', verifySuperAdmin, userService.GetUsers);
+router.post('/GetUsers', userService.GetUsers);
+router.get('/TodaysUser', userService.TodaysUser);
+router.get('/TodaysOrder', userService.TodaysOrder);
+router.get('/GetTodaysSales', userService.GetTodaysSales);
+
+
+router.get('/GetUsersAnalyticsDaily', userService.GetUsersAnalyticsDaily);
+router.get('/GetUsersAnalyticsMonthly', userService.GetUsersAnalyticsMonthly);
+router.get('/GetOrdersAnalyticsDaily', userService.GetOrdersAnalyticsDaily);
+router.get('/GetOrdersAnalyticsMonthly', userService.GetOrdersAnalyticsMonthly);
 
 router.get('/GetCart/:user', verifyUser, userService.GetCart);
 router.post('/AddCartItem/:user', verifyUser, userService.AddCartItem);

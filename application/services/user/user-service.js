@@ -1,6 +1,9 @@
 const Authorization = require('../../utils/authorization_util');
 const UserModel = require('../../models/user/user-model');
-const UserCartModel = require('../../models/user/user-cart-model')
+const OrderModel = require('../../models/order/order-model');
+const UserCartModel = require('../../models/user/user-cart-model');
+const CompletedOrderModel = require('../../models/order/completed-order-model');
+
 const { sendSMS, verifyOTP } = require('./../../utils/sendSMS');
 
 exports.RegisterUser = async (req, res) => {
@@ -132,6 +135,284 @@ exports.GetUsers = async (req, res) => {
       }
 }
 
+exports.TodaysUser = async (req, res) => {
+      const currentDate = new Date();
+      try {
+            const results = await UserModel.aggregate([
+                  {
+                        $match: {
+                              createdAt: {
+                                    $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
+                                    $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1),
+                              },
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: null,
+                              count: { $sum: 1 },
+                        },
+                  },
+            ]);
+            res.status(200).send({
+                  data: results.length > 0 ? results[0].count : 0,
+                  message: 'Users analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(200).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
+exports.TodaysOrder = async (req, res) => {
+      const currentDate = new Date();
+      try {
+            const results = await OrderModel.aggregate([
+                  {
+                        $match: {
+                              createdAt: {
+                                    $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
+                                    $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1),
+                              },
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: null,
+                              count: { $sum: 1 },
+                        },
+                  },
+            ]);
+            res.status(200).send({
+                  data: results.length > 0 ? results[0].count : 0,
+                  message: 'Orders analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(200).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
+exports.GetTodaysSales = async (req, res) => {
+      const today = new Date();
+      try {
+            today.setHours(0, 0, 0, 0);
+            const query = { created_date: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) } };
+            const sales = await CompletedOrderModel.find(query, { _id: 0, name: 1 });
+            let totalSalesAmount = 0;
+            sales.forEach(doc => totalSalesAmount += doc.orderAmount);
+            res.status(200).send({
+                  data: totalSalesAmount,
+                  message: 'Sales analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(500).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
+exports.GetUsersAnalyticsDaily = async (req, res) => {
+      let data = [];
+      const currentDate = new Date();
+      const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+      try {
+            for (let i = 0; i < 7; i++) {
+                  const currentDate = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
+                  const startTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+                  const endTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
+                  const tempData = await UserModel.aggregate([
+                        {
+                              $match: {
+                                    createdAt: {
+                                          $gte: startTime,
+                                          $lt: endTime,
+                                    },
+                              },
+                        },
+                        {
+                              $group: {
+                                    _id: null,
+                                    count: { $sum: 1 }
+                              },
+                        }
+                  ]);
+                  if (tempData?.length) {
+                        data.push({
+                              count: tempData[0]['count'] || 0,
+                              day: new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(currentDate).split(',')[0],
+                        })
+                  } else {
+                        data.push({
+                              count: 0,
+                              day: new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(currentDate).split(',')[0],
+                        })
+
+                  }
+            }
+            res.status(200).send({
+                  data,
+                  message: 'User analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(200).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
+exports.GetOrdersAnalyticsDaily = async (req, res) => {
+      let data = [];
+      const currentDate = new Date();
+      const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+      try {
+            for (let i = 0; i < 7; i++) {
+                  const currentDate = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
+                  const startTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+                  const endTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
+                  const tempData = await OrderModel.aggregate([
+                        {
+                              $match: {
+                                    createdAt: {
+                                          $gte: startTime,
+                                          $lt: endTime,
+                                    },
+                              },
+                        },
+                        {
+                              $group: {
+                                    _id: null,
+                                    count: { $sum: 1 }
+                              },
+                        }
+                  ]);
+                  if (tempData?.length) {
+                        data.push({
+                              count: tempData[0]['count'] || 0,
+                              day: new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(currentDate).split(',')[0],
+                        })
+                  } else {
+                        data.push({
+                              count: 0,
+                              day: new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(currentDate).split(',')[0],
+                        })
+
+                  }
+            }
+            res.status(200).send({
+                  data,
+                  message: 'Order analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(200).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
+exports.GetUsersAnalyticsMonthly = async (req, res) => {
+      const currentDate = new Date();
+      const startDate = new Date(currentDate.getFullYear(), 0, 1); // January 1st of the current year
+      const endDate = new Date(currentDate.getFullYear(), 11, 31); // December
+      try {
+            const tempData = await UserModel.aggregate([
+                  {
+                        $match: {
+                              createdAt: {
+                                    $gte: startDate,
+                                    $lte: endDate,
+                              },
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+                              count: { $sum: 1 },
+                        },
+                  },
+            ])
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthsCount = Array(12).fill(0);
+
+            for (const result of tempData) {
+                  const [year, month] = result._id.split('-');
+                  monthsCount[parseInt(month) - 1] = result.count;
+            }
+            const monthlyCounts = months.map((month, index) => ({ month, count: monthsCount[index] }));
+            res.status(200).send({
+                  data: monthlyCounts,
+                  message: 'Users analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(200).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
+exports.GetOrdersAnalyticsMonthly = async (req, res) => {
+      const currentDate = new Date();
+      const startDate = new Date(currentDate.getFullYear(), 0, 1); // January 1st of the current year
+      const endDate = new Date(currentDate.getFullYear(), 11, 31); // December
+      try {
+            const tempData = await OrderModel.aggregate([
+                  {
+                        $match: {
+                              createdAt: {
+                                    $gte: startDate,
+                                    $lte: endDate,
+                              },
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+                              count: { $sum: 1 },
+                        },
+                  },
+            ])
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthsCount = Array(12).fill(0);
+
+            for (const result of tempData) {
+                  const [year, month] = result._id.split('-');
+                  monthsCount[parseInt(month) - 1] = result.count;
+            }
+            const monthlyCounts = months.map((month, index) => ({ month, count: monthsCount[index] }));
+            res.status(200).send({
+                  data: monthlyCounts,
+                  message: 'Users analytics data',
+                  statusCode: 200
+            })
+      } catch (err) {
+            res.status(200).send({
+                  data: null,
+                  message: err?.message || 'Something went wrong',
+                  statusCode: 500
+            })
+      }
+}
+
 exports.GetCart = async (req, res) => {
       const { user } = req.params;
       try {
@@ -173,6 +454,7 @@ exports.AddCartItem = async (req, res) => {
             res.status(400).json({ statusCode: 400, message: error.message });
       }
 }
+
 exports.RemoveCartItem = async (req, res) => {
       const { user } = req.params;
       const item = req.body;
