@@ -19,7 +19,7 @@ const verifyAdmin = async(req, res, next) => {
       const authHeader = req.headers.authorization;
       if (authHeader) {
             const token = authHeader.split(' ')[1];
-            const authorizedAdmin =  isAdminAuthorized(token);
+            const authorizedAdmin =  await isAdminAuthorized(token);
             if(!authorizedAdmin){
                  return res.status(403).json({ error: 'Forbidden' });
             }

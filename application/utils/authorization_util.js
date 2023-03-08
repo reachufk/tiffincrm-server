@@ -2,13 +2,13 @@ const jwt = require('jsonwebtoken')
 const config = require('../../config/config')
 
 const authorizeUser = (payload) => {
-      return jwt.sign(payload, config.SecretKey, { expiresIn: "2h" });
+      return jwt.sign(payload, config.SecretKey, { expiresIn: "8h" });
 };
 const authorizeAdmin = (payload) => {
-      return jwt.sign(payload, config.SecretKeyAdmin, { expiresIn: '2h' });
+      return jwt.sign(payload, config.SecretKeyAdmin, { expiresIn: '8h' });
 }
 const authorizeSuperAdmin = (payload) => {
-      return jwt.sign(payload, config.SecretKeyAdmin, { expiresIn: '2h' });
+      return jwt.sign(payload, config.SecretKeyAdmin, { expiresIn: '8h' });
 }
 const isUserAuthorized = (token) => {
       try {
@@ -17,9 +17,9 @@ const isUserAuthorized = (token) => {
             return false;
       }
 };
-const isAdminAuthorized = (token) => {
+const isAdminAuthorized = async (token) => {
       try {
-            return jwt.verify(token, config.SecretKeyAdmin);
+            return  jwt.verify(token, config.SecretKeyAdmin);
       } catch (err) {
             return false;
       }
