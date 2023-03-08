@@ -193,7 +193,7 @@ exports.TodaysOrder = async (req, res) => {
                   statusCode: 200
             })
       } catch (err) {
-            res.status(200).send({
+            res.status(500).send({
                   data: null,
                   message: err?.message || 'Something went wrong',
                   statusCode: 500
@@ -203,11 +203,12 @@ exports.TodaysOrder = async (req, res) => {
 
 exports.GetTodaysSales = async (req, res) => {
       const today = new Date();
+      let totalSalesAmount = 0;
       try {
             today.setHours(0, 0, 0, 0);
-            const query = { created_date: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) } };
-            const sales = await CompletedOrderModel.find(query, { _id: 0, name: 1 });
-            let totalSalesAmount = 0;
+            const sales = await CompletedOrderModel.find({
+                  createdAt: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) }
+            });
             sales.forEach(doc => totalSalesAmount += doc.orderAmount);
             res.status(200).send({
                   data: totalSalesAmount,
