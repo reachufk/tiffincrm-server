@@ -40,17 +40,17 @@ exports.Login = async (req, res) => {
                   let token = '';
                   const { username, phoneNumber, role } = User
                   if (role == 'user') {
-                        token = Authorization.authorizeUser({ username, phoneNumber, role });
+                        token = Authorization.authorizeUser({ phoneNumber, role });
                   } else {
                         if (role == 'admin') {
                               //admin
-                              token = Authorization.authorizeAdmin({ username, phoneNumber, role });
+                              token = Authorization.authorizeAdmin({ phoneNumber, role });
                         } else {
                               //super admin
-                              token = Authorization.authorizeSuperAdmin({ username, phoneNumber, role });
+                              token = Authorization.authorizeSuperAdmin({ phoneNumber, role });
                         }
                   }
-                  const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token }
+                  const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token:token }
                   res.status(200).json({ statusCode: 200, message: "login success", user: loggedUser })
             } else {
                   res.status(200).json({ statusCode: 404, message: "invalid username" });
