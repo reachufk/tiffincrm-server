@@ -10,6 +10,8 @@ router.post('/SetCompletedOrder/:orderId',verifyAdmin,orderService.SetCompletedO
 router.post('/GetCompletedOrders',verifyAdmin,orderService.GetCompletedOrders);
 router.get('/GetLatestOrders',verifyAdmin,orderService.GetLatestOrders);
 router.post('/GetAdminOrders',verifyAdmin,orderService.GetAdminOrders);
+router.put('/UpdateAdminCreatedOrder/:id',verifyAdmin,orderService.UpdateAdminCreatedOrder);
+router.post('/GetAdminCompletedOrders',verifyAdmin,orderService.GetAdminCompletedOrders);
 router.get('/GetFutureOrders',verifyAdmin,orderService.GetFutureOrders);
 router.get('/GetUserOrders/:user',verifyUser,orderService.GetUserOrders);
 

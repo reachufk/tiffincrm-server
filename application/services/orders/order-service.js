@@ -150,6 +150,7 @@ exports.GetAdminOrders = async (req, res) => {
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
+                  orderPaymentStatus:'pending',
                   $or: [
                         { username: { $regex: keyword, $options: 'i' } },
                         { phoneNumber: { $regex: keyword, $options: 'i' } },
@@ -174,6 +175,48 @@ exports.GetAdminOrders = async (req, res) => {
       }
 }
 
+exports.GetAdminCompletedOrders = async (req, res) => {
+      try {
+            const { pageNo, pageSize, keyword } = req.body
+            const query = {
+                  orderPaymentStatus:'completed',
+                  $or: [
+                        { username: { $regex: keyword, $options: 'i' } },
+                        { phoneNumber: { $regex: keyword, $options: 'i' } },
+                        { email: { $regex: keyword, $options: 'i' } },
+                        { orderAddress: { $regex: keyword, $options: 'i' } },
+                        { orderMode: { $regex: keyword, $options: 'i' } }
+                  ]
+            }
+            const totalCount = await AdminOrderModel.countDocuments(query);
+            const totalPages = Math.ceil(+totalCount / +pageSize);
+            const orders = await AdminOrderModel.find(query)
+                  .skip((+pageNo - 1) * +pageSize)
+                  .limit(+pageSize)
+                  .exec();
+            if (orders && orders?.length) {
+                  res.status(200).json({ statusCode: 200, orders, totalCount, totalPages })
+            } else {
+                  res.status(404).json('no order found')
+            }
+      } catch (error) {
+            res.status(400).json(error.message)
+      }
+}
+
+exports.UpdateAdminCreatedOrder = async(req,res)=>{
+      const {id} = req.params;
+      const {body} = req;
+      try {
+            const updated = await AdminOrderModel.findOneAndUpdate({_id:id},body);
+            if(!updated){
+                  return res.status(200).json({statusCode:404,message:'order not found to update'})
+            }
+            res.status(200).json({statusCode:200,message:'odrder updated'})
+      } catch (error) {
+            res.status(400).json(error.message)
+      }
+}
 
 exports.GetUserOrders = async (req, res) => {
       const { user } = req.params;

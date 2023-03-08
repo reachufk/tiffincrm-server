@@ -13,7 +13,7 @@ const AdminOrderSchema = new mongoose.Schema({
       phoneNumber:{ type: String, required: true },
       orderAddress: { type: String, required: true },
       orderAmount: { type: Number, required: true },
-      orderMode: { type: String, required: [true, "must be either online or offline"] },
+      orderMode: { type: String, required: [true, "must be either online or offline"],default:'ofline' },
       orderItems: [ItemSchema],
       orderDeliveryTime:{ type: String, required: [true, "Delivery date not passed"] },
       orderPaymentMode: { type: String, required: [true, "must be either online or offline"] },
