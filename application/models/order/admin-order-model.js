@@ -15,10 +15,12 @@ const AdminOrderSchema = new mongoose.Schema({
       orderAmount: { type: Number, required: true },
       orderMode: { type: String, required: [true, "must be either online or offline"] },
       orderItems: [ItemSchema],
+      orderDeliveryTime:{ type: String, required: [true, "Delivery date not passed"] },
       orderPaymentMode: { type: String, required: [true, "must be either online or offline"] },
+      orderPaymentStatus:{ type: String ,default:'pending'},
       orderInstructions: { type: String },
       orderDeliveryTime: { type: String },
-      orderType: { type: String },
+      orderType: { type: String,required:true },
 },{ timestamps: true });
 
 const OrderModel = mongoose.model('AdminOrders', AdminOrderSchema, 'AdminOrders')
