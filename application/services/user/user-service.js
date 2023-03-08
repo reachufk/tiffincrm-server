@@ -190,7 +190,7 @@ exports.TodaysOrder = async (req, res) => {
                   statusCode: 200
             })
       } catch (err) {
-            res.status(200).send({
+            res.status(500).send({
                   data: null,
                   message: err?.message || 'Something went wrong',
                   statusCode: 500
