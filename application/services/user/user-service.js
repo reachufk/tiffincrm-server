@@ -2,8 +2,7 @@ const Authorization = require('../../utils/authorization_util');
 const UserModel = require('../../models/user/user-model');
 const OrderModel = require('../../models/order/order-model');
 const UserCartModel = require('../../models/user/user-cart-model');
-const CompletedOrderSchema = require('../../models/order/completed-order-model');
-
+const CompletedOrderModel = require('../../models/order/completed-order-model');
 
 const { sendSMS, verifyOTP } = require('./../../utils/sendSMS');
 
@@ -200,39 +199,20 @@ exports.TodaysOrder = async (req, res) => {
 }
 
 exports.GetTodaysSales = async (req, res) => {
-      const currentDate = new Date();
+      const today = new Date();
       try {
-            const results = await CompletedOrderSchema.find({
-                  createdAt: {
-                        $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
-                        $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1),
-                  }
-            });
-
-
-            // aggregate([
-            //       {
-            //             $match: {
-            //                   createdAt: {
-            //                         $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
-            //                         $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1),
-            //                   },
-            //             },
-            //       },
-            //       {
-            //             $group: {
-            //                   _id: null,
-            //                   count: { $sum: 1 },
-            //             },
-            //       },
-            // ]);
+            today.setHours(0, 0, 0, 0);
+            const query = { created_date: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) } };
+            const sales = await CompletedOrderModel.find(query, { _id: 0, name: 1 });
+            let totalSalesAmount = 0;
+            sales.forEach(doc => totalSalesAmount += doc.orderAmount);
             res.status(200).send({
-                  data: results.length > 0 ? results[0].count : 0,
+                  data: totalSalesAmount,
                   message: 'Sales analytics data',
                   statusCode: 200
             })
       } catch (err) {
-            res.status(200).send({
+            res.status(500).send({
                   data: null,
                   message: err?.message || 'Something went wrong',
                   statusCode: 500
