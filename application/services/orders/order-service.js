@@ -17,7 +17,7 @@ exports.PlaceOrder = async (req, res) => {
             const savedOrder = await order.save();
             await UserCartModel.findOneAndUpdate({user:body.user},{$set:{cartItems:[]}});
             socket.ioObject.sockets.in("order").emit("newOrder", savedOrder);
-            res.status(201).json({ statusCode: 201, message: 'order placed', order: savedOrder });
+            res.status(200).json({ statusCode: 201, message: 'order placed', order: savedOrder });
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error?.message })
       }
@@ -27,7 +27,7 @@ exports.PlaceAdminOrder = async (req, res) => {
       try {
             const order = new AdminOrderModel(req.body);
             const savedOrder = await order.save();
-            res.status(201).json({ statusCode: 201, message: 'order placed by admin', order: savedOrder });
+            res.status(200).json({ statusCode: 201, message: 'order placed by admin', order: savedOrder });
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error?.message })
       }
@@ -99,10 +99,7 @@ exports.SetCompletedOrder = async (req, res) => {
             order.prevOrderId = orderId;
             order.orderStatus = 'completed';
             const completedOrder = new CompletedOrderModel(order)
-            const isSaved = await completedOrder.save();
-            if (!isSaved) {
-                  return res.status(500).json({ statusCode: 500, message: 'failed to save' })
-            }
+            await completedOrder.save();
             const deleteFromOrders = await OrderModel.findByIdAndDelete(orderId)
             if (!deleteFromOrders) {
                   return res.status(200).json({ statusCode: 200, message: 'failed to delete order from orders' })
@@ -120,7 +117,7 @@ exports.GetLatestOrders = async (req, res) => {
             if (orders && orders.length) {
                   res.status(200).json({ statusCode: 200, data: orders })
             } else {
-                  res.status(404).json({ statusCode: 404, message: 'empty latest orders' })
+                  res.status(200).json({ statusCode: 404, message: 'empty latest orders' })
             }
       } catch (error) {
             res.status(400).json({ statusCode: 400, error: error.message })
@@ -129,13 +126,13 @@ exports.GetLatestOrders = async (req, res) => {
 }
 
 exports.GetFutureOrders = async (req, res) => {
-      const currentDate = new Date().toISOString().slice(0, 10);
+      const currentDate = new Date().toISOString().slice(0,10);
       try {
             const orders = await OrderModel.find({ orderStatus: "pending" })
             if (orders && orders.length) {
                   const futureOrders = orders.filter((order) => {
-                        const deliveryDate = order.orderDeliveryTime.slice(0, 10)
-                        return deliveryDate !== currentDate;
+                        const deliveryDate = order.orderDeliveryTime.slice(0,10)
+                        return Date.parse(deliveryDate)  > Date.parse(currentDate);
                   });
                   return res.status(200).json({ statusCode: 200, data: futureOrders, message: 'success' })
             } else {
@@ -168,7 +165,7 @@ exports.GetAdminOrders = async (req, res) => {
             if (orders && orders?.length) {
                   res.status(200).json({ statusCode: 200, orders, totalCount, totalPages })
             } else {
-                  res.status(404).json('no order found')
+                  res.status(200).json({message:'no orders found'})
             }
       } catch (error) {
             res.status(400).json(error.message)
@@ -197,7 +194,7 @@ exports.GetAdminCompletedOrders = async (req, res) => {
             if (orders && orders?.length) {
                   res.status(200).json({ statusCode: 200, orders, totalCount, totalPages })
             } else {
-                  res.status(404).json('no order found')
+                  res.status(200).json({message:'no orders found'})
             }
       } catch (error) {
             res.status(400).json(error.message)

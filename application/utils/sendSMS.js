@@ -13,6 +13,9 @@ if (!accountSid || !authToken || !verifySid) {
 const client = twillo(accountSid, authToken);
 
 const sendSMS = async (phoneNumber) => {
+    if(!phoneNumber?.includes('+91')){
+        phoneNumber = `+91${phoneNumber}`
+    }
     try {
         const { status } = await client.verify.v2.services(verifySid).verifications.create({ to: phoneNumber, channel: "sms" });
         return status;
@@ -23,6 +26,9 @@ const sendSMS = async (phoneNumber) => {
 }
 
 const verifyOTP = async (phoneNumber, otpCode) => {
+    if(!phoneNumber?.includes('+91')){
+        phoneNumber = `+91${phoneNumber}`
+    }
     try {
         const { valid } = await client.verify.v2.services(verifySid).verificationChecks.create({ to: phoneNumber, code: otpCode });
         return valid;
