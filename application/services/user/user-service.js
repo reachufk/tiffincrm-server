@@ -171,7 +171,8 @@ exports.TodaysUser = async (req, res) => {
 exports.TodaysOrder = async (req, res) => {
       const currentDate = new Date();
       try {
-            const results = await OrderModel.aggregate([
+            currentDate.setHours(0, 0, 0, 0)
+            const results = await CompletedOrderModel.aggregate([
                   {
                         $match: {
                               createdAt: {
@@ -207,7 +208,7 @@ exports.GetTodaysSales = async (req, res) => {
       try {
             today.setHours(0, 0, 0, 0);
             const sales = await CompletedOrderModel.find({
-                  createdAt: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) }
+                  updatedAt: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) }
             });
             sales.forEach(doc => totalSalesAmount += doc.orderAmount);
             res.status(200).send({
