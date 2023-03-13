@@ -131,7 +131,7 @@ exports.GetFutureOrders = async (req, res) => {
             const orders = await OrderModel.find({ orderStatus: "pending" })
             if (orders && orders.length) {
                   const futureOrders = orders.filter((order) => {
-                        const deliveryDate = order.orderDeliveryTime.slice(0,10)
+                        const deliveryDate = order.orderDeliveryTime.split(',')[0]
                         return Date.parse(deliveryDate)  > Date.parse(currentDate);
                   });
                   return res.status(200).json({ statusCode: 200, data: futureOrders, message: 'success' })
@@ -177,7 +177,7 @@ exports.GetAdminCompletedOrders = async (req, res) => {
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
-                  orderPaymentStatus:'completed',
+                  orderStatus:'completed',
                   $or: [
                         { username: { $regex: keyword, $options: 'i' } },
                         { phoneNumber: { $regex: keyword, $options: 'i' } },
@@ -193,7 +193,7 @@ exports.GetAdminCompletedOrders = async (req, res) => {
                   .limit(+pageSize)
                   .exec();
             if (orders && orders?.length) {
-                  res.status(200).json({ statusCode: 200, orders, totalCount, totalPages })
+                  res.status(200).json({ statusCode: 200, data:orders, totalCount, totalPages })
             } else {
                   res.status(200).json({message:'no orders found'})
             }
@@ -255,7 +255,7 @@ exports.GetAdminFutureOrders = async (req, res) => {
                   .exec();
             if (orders && orders?.length) {
                      const futureOrders = orders.filter((order) => {
-                        const deliveryDate = order.orderDeliveryTime.slice(0,10)
+                        const deliveryDate = order.orderDeliveryTime.split(',')[0]
                         return Date.parse(deliveryDate)  > Date.parse(currentDate);
                   });
                   res.status(200).json({ statusCode: 200, data:futureOrders, totalCount, totalPages })
