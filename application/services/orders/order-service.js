@@ -144,6 +144,7 @@ exports.GetFutureOrders = async (req, res) => {
 }
 
 exports.GetAdminOrders = async (req, res) => {
+       const currentDate = new Date().toISOString().slice(0, 10);
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
@@ -200,6 +201,72 @@ exports.GetAdminCompletedOrders = async (req, res) => {
             res.status(400).json(error.message)
       }
 }
+
+exports.GetAdminLatestOrders = async (req, res) => {
+       const currentDate = new Date().toISOString().slice(0,10);
+      try {
+            const { pageNo, pageSize, keyword } = req.body
+            const query = {
+                  orderPaymentStatus:'pending',
+                  orderDeliveryTime: { $regex: currentDate },
+                  $or: [
+                        { username: { $regex: keyword, $options: 'i' } },
+                        { phoneNumber: { $regex: keyword, $options: 'i' } },
+                        { email: { $regex: keyword, $options: 'i' } },
+                        { orderAddress: { $regex: keyword, $options: 'i' } },
+                        { orderMode: { $regex: keyword, $options: 'i' } }
+                  ]
+            }
+            const totalCount = await AdminOrderModel.countDocuments(query);
+            const totalPages = Math.ceil(+totalCount / +pageSize);
+            const orders = await AdminOrderModel.find(query)
+                  .skip((+pageNo - 1) * +pageSize)
+                  .limit(+pageSize)
+                  .exec();
+            if (orders && orders?.length) {
+                
+                  res.status(200).json({ statusCode: 200, data:orders, totalCount, totalPages })
+            } else {
+                  res.status(200).json({message:'no orders found'})
+            }
+      } catch (error) {
+            res.status(400).json(error.message)
+      }
+}
+exports.GetAdminFutureOrders = async (req, res) => {
+      const currentDate = new Date().toISOString().slice(0,10);
+      try {
+            const { pageNo, pageSize, keyword } = req.body
+            const query = {
+                  orderPaymentStatus:'pending',
+                  $or: [
+                        { username: { $regex: keyword, $options: 'i' } },
+                        { phoneNumber: { $regex: keyword, $options: 'i' } },
+                        { email: { $regex: keyword, $options: 'i' } },
+                        { orderAddress: { $regex: keyword, $options: 'i' } },
+                        { orderMode: { $regex: keyword, $options: 'i' } }
+                  ]
+            }
+            const totalCount = await AdminOrderModel.countDocuments(query);
+            const totalPages = Math.ceil(+totalCount / +pageSize);
+            const orders = await AdminOrderModel.find(query)
+                  .skip((+pageNo - 1) * +pageSize)
+                  .limit(+pageSize)
+                  .exec();
+            if (orders && orders?.length) {
+                     const futureOrders = orders.filter((order) => {
+                        const deliveryDate = order.orderDeliveryTime.slice(0,10)
+                        return Date.parse(deliveryDate)  > Date.parse(currentDate);
+                  });
+                  res.status(200).json({ statusCode: 200, data:futureOrders, totalCount, totalPages })
+            } else {
+                  res.status(200).json({message:'no orders found'})
+            }
+      } catch (error) {
+            res.status(400).json(error.message)
+      }
+}
+
 
 exports.UpdateAdminCreatedOrder = async(req,res)=>{
       const {id} = req.params;
