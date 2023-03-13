@@ -3,6 +3,7 @@ const UserModel = require('../../models/user/user-model');
 const OrderModel = require('../../models/order/order-model');
 const UserCartModel = require('../../models/user/user-cart-model');
 const CompletedOrderModel = require('../../models/order/completed-order-model');
+const AdminOrdersModel = require('../../models/order/admin-order-model');
 
 const { sendSMS, verifyOTP } = require('./../../utils/sendSMS');
 
@@ -50,7 +51,7 @@ exports.Login = async (req, res) => {
                               token = Authorization.authorizeSuperAdmin({ phoneNumber, role });
                         }
                   }
-                  const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token:token }
+                  const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token: token }
                   res.status(200).json({ statusCode: 200, message: "login success", user: loggedUser })
             } else {
                   res.status(200).json({ statusCode: 404, message: "invalid username" });
@@ -70,9 +71,9 @@ exports.VerifyUsersOTP = async (req, res) => {
             const User = new UserModel(signupData);
             await User.save();
             const { username, phoneNumber, role } = User
-           const token = Authorization.authorizeUser({ username, phoneNumber, role });
-           const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token }
-            return res.status(200).json({ statusCode: 201, message: 'User registered successfully.',data:loggedUser });
+            const token = Authorization.authorizeUser({ username, phoneNumber, role });
+            const loggedUser = { user: User._id, username: User.username, email: User.email, phoneNumber: User.phoneNumber, role: User.role, token }
+            return res.status(200).json({ statusCode: 201, message: 'User registered successfully.', data: loggedUser });
       } catch (error) {
             return res.status(500).json(error.message);
       }
@@ -172,7 +173,7 @@ exports.TodaysOrder = async (req, res) => {
       const currentDate = new Date();
       try {
             currentDate.setHours(0, 0, 0, 0)
-            const results = await CompletedOrderModel.aggregate([
+            const userOrders = await CompletedOrderModel.aggregate([
                   {
                         $match: {
                               createdAt: {
@@ -188,8 +189,25 @@ exports.TodaysOrder = async (req, res) => {
                         },
                   },
             ]);
+            const adminOrders = await AdminOrdersModel.aggregate([
+                  {
+                        $match: {
+                              createdAt: {
+                                    $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
+                                    $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1),
+                              },
+                              orderStatus: 'completed'
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: null,
+                              count: { $sum: 1 },
+                        },
+                  },
+            ]);
             res.status(200).send({
-                  data: results.length > 0 ? results[0].count : 0,
+                  data: userOrders.length || adminOrders.length > 0 ? userOrders[0].count + adminOrders[0].count : 0,
                   message: 'Orders analytics data',
                   statusCode: 200
             })
@@ -207,10 +225,14 @@ exports.GetTodaysSales = async (req, res) => {
       let totalSalesAmount = 0;
       try {
             today.setHours(0, 0, 0, 0);
-            const sales = await CompletedOrderModel.find({
+            const userSales = await CompletedOrderModel.find({
                   updatedAt: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) }
             });
-            sales.forEach(doc => totalSalesAmount += doc.orderAmount);
+            const adminSales = await AdminOrdersModel.find({
+                  updatedAt: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000), orderStatus: 'completed' }
+            });
+            userSales.forEach(doc => totalSalesAmount += doc.orderAmount);
+            adminSales.forEach(doc => totalSalesAmount += doc.orderAmount);
             res.status(200).send({
                   data: totalSalesAmount,
                   message: 'Sales analytics data',
