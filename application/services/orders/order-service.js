@@ -207,7 +207,7 @@ exports.GetAdminLatestOrders = async (req, res) => {
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
-                  orderPaymentStatus:'pending',
+                  orderStatus:'pending',
                   orderDeliveryTime: { $regex: currentDate },
                   $or: [
                         { username: { $regex: keyword, $options: 'i' } },
@@ -238,7 +238,7 @@ exports.GetAdminFutureOrders = async (req, res) => {
       try {
             const { pageNo, pageSize, keyword } = req.body
             const query = {
-                  orderPaymentStatus:'pending',
+                  orderStatus:'pending',
                   $or: [
                         { username: { $regex: keyword, $options: 'i' } },
                         { phoneNumber: { $regex: keyword, $options: 'i' } },
@@ -286,8 +286,10 @@ exports.GetUserOrders = async (req, res) => {
       const { user } = req.params;
       try {
             const userOrders = await OrderModel.find({ user });
-            if (userOrders && userOrders.length) {
-                  res.status(200).json({ statusCode: 200, data: userOrders, message: 'success' })
+            const userCompletedOrders = await CompletedOrderModel.find({ user });
+            const allOrders = userOrders.concat(userCompletedOrders);
+            if (allOrders.length) {
+                  res.status(200).json({ statusCode: 200, data: allOrders, message: 'success' })
             } else {
                   res.status(200).json({ statusCode: 404, message: 'no orders made for user' })
             }

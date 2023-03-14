@@ -2,8 +2,8 @@ const twillo = require("twilio");
 const { exit } = require("process");
 
 const accountSid = "AC58046bde8ac79ab9d5c94c8f8dac5020";
-const authToken = "a0ff90cf13e57cc9a2bd2fe653a2efbc"
-const verifySid = "VAc9eb3a798b214550a05a00eb2c684c8e"
+const authToken = "25039fb3b2727b26776614d7eba73c70"
+const verifySid = "VA46e19e059308c9c2a7837638e6828d5d"
 
 if (!accountSid || !authToken || !verifySid) {
     console.log('Something went wrong with Twilio SMS Service');

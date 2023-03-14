@@ -5,7 +5,9 @@ const userService = require('../../services/user/user-service');
 
 router.post('/RegisterUser', userService.RegisterUser);
 router.post('/verify-otp', userService.VerifyUsersOTP);
-
+router.get('/ForgotPassword/:phoneNumber', userService.ForgotPassword);
+router.post('/VerifyForgotOTP', userService.VerifyForgotOTP);
+router.post('/ResetPassword', userService.ResetPassword);
 router.post('/Login', userService.Login);
 router.put('/UpdateUser/:user', verifyUser, userService.UpdateUser);
 router.get('/GetUser', verifyUser, userService.GetUser);

@@ -6,6 +6,7 @@ const CompletedOrderModel = require('../../models/order/completed-order-model');
 const AdminOrdersModel = require('../../models/order/admin-order-model');
 
 const { sendSMS, verifyOTP } = require('./../../utils/sendSMS');
+const { HashPassword } = require('../../utils/hashPassword');
 
 exports.RegisterUser = async (req, res) => {
       try {
@@ -28,6 +29,52 @@ exports.RegisterUser = async (req, res) => {
             res.status(400).json(error.message);
       }
 }
+
+exports.ForgotPassword = async(req,res)=>{
+      const {phoneNumber} = req.params;
+      try {
+            const isExists = await UserModel.findOne({phoneNumber});
+            if(!isExists){
+                  return res.status(200).json({statusCode:404,message:'mobile no. is not registered'})
+            }
+            const status = await sendSMS(phoneNumber);
+            if (status !== 'pending') {
+                  return res.status(500).json({ statusCode: 500, message: 'Something went wrong.' });
+            }
+            return res.status(200).json({ statusCode: 200, message: 'SMS sent successfully.' });
+      } catch (error) {
+            res.status(400).json(error.message);
+      }
+}
+
+exports.VerifyForgotOTP = async(req,res)=>{
+      const {phoneNumber,otp} = req.body;
+      try {
+            const valid = await verifyOTP(phoneNumber, otp);
+            if (!valid) {
+                  return res.status(200).json({ statusCode: 400, message: 'Invalid OPT.' });
+            }
+            return res.status(200).json({ statusCode: 200, message: 'otp verified.' });
+      } catch (error) {
+            return res.status(400).json(error.message);
+      }
+}
+
+exports.ResetPassword= async(req,res)=>{
+      const {phoneNumber,password} = req.body;
+      try {
+            const hashPassword = await HashPassword(password);
+            const userUpdate = await UserModel.findOneAndUpdate({phoneNumber},{password:hashPassword});
+            if(!userUpdate){
+                  return res.status(200).json({ statusCode: 404, message: 'somehing went wrong.' });
+            }
+            userUpdate
+            return res.status(200).json({ statusCode: 200, message: 'password changed success' });
+      } catch (error) {
+            return res.status(400).json(error.message);
+      }
+}
+
 
 exports.Login = async (req, res) => {
       const { phoneNumber, password } = req.body;
